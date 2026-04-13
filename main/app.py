@@ -7,7 +7,7 @@ Requirements: pip install streamlit plotly pandas
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
-
+st.write("🚀 APP IS RUNNING")
 # ─────────────────────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────────────────────
