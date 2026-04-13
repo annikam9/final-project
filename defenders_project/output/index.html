@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Organized Crime Threatens Environmental Defenders in Latin America</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+:root{
+  --bg:#0d0d0d;--bg2:#141414;--bg3:#1c1c1c;--bg4:#252525;
+  --text:#e8e0d0;--text2:#a09880;--text3:#6a6050;
+  --red:#c0392b;--red2:#e74c3c;--amber:#e67e22;--amber2:#f39c12;
+  --teal:#1abc9c;
+  --border:rgba(255,255,255,0.08);
+  --serif:'Playfair Display',Georgia,serif;
+  --body:'Source Serif 4',Georgia,serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.8}
+
+#lang-switch{position:fixed;top:20px;right:24px;z-index:999;display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:rgba(13,13,13,.95);backdrop-filter:blur(8px)}
+#lang-switch button{background:transparent;border:none;color:var(--text3);font-family:var(--mono);font-size:11px;letter-spacing:.12em;padding:7px 14px;cursor:pointer;transition:all .2s}
+#lang-switch button.active{background:var(--red);color:#fff}
+#lang-switch button:hover:not(.active){color:var(--text)}
+
+header{max-width:860px;margin:0 auto;padding:120px 24px 60px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:28px}
+h1{font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;line-height:1.1;color:#fff;margin-bottom:28px;letter-spacing:-.01em}
+h1 em{color:var(--red2);font-style:italic}
+.subtitle{font-size:1.25rem;font-weight:300;color:var(--text2);line-height:1.6;margin-bottom:40px;max-width:680px}
+.byline{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--text3);padding-top:28px;border-top:1px solid var(--border)}
+.byline strong{color:var(--text2)}
+.rule{width:100%;height:1px;background:var(--border)}
+
+.article-body{max-width:680px;margin:0 auto;padding:60px 24px}
+.article-body p{margin-bottom:28px;font-weight:300}
+.placeholder-text{color:var(--text3);border-left:2px solid var(--bg4);padding-left:20px;font-style:italic;font-size:.9rem;margin-bottom:28px}
+
+/* GLOSSARY */
+.gloss{border-bottom:1px dashed rgba(230,126,34,.6);cursor:help;position:relative;display:inline}
+.gloss-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1e1a14;border:1px solid rgba(230,126,34,.3);border-radius:5px;padding:10px 14px;width:260px;font-size:.78rem;font-style:normal;line-height:1.5;color:var(--text2);font-family:var(--body);z-index:300;pointer-events:none;white-space:normal;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.gloss-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1e1a14}
+.gloss:hover .gloss-tip,.gloss:focus .gloss-tip{display:block}
+
+.viz-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:60px 0}
+.viz-inner{max-width:1100px;margin:0 auto;padding:0 24px}
+.viz-title{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:8px}
+.viz-subtitle{font-size:.85rem;color:var(--text2);margin-bottom:32px;font-weight:300}
+
+.country-selector{display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.country-selector label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--text3)}
+.country-selector select{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:.95rem;padding:8px 32px 8px 14px;border-radius:4px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23a09880' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--bg3)}
+
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:14px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:18px 20px;transition:border-color .2s}
+.stat-card:hover{border-color:rgba(255,255,255,.15)}
+.stat-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.stat-value{font-family:var(--serif);font-size:2rem;font-weight:700;color:#fff;line-height:1;margin-bottom:4px}
+.stat-value.red{color:var(--red2)}.stat-value.amber{color:var(--amber2)}.stat-value.teal{color:var(--teal)}
+.stat-note{font-size:.72rem;color:var(--text3)}
+.lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.perp-bars{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+.perp-row{display:flex;align-items:center;gap:8px}
+.perp-name{font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--text2);width:112px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.perp-track{flex:1;height:7px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.perp-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.perp-pct{font-family:var(--mono);font-size:9px;color:var(--text3);width:34px;text-align:right;flex-shrink:0}
+
+.oci-card{display:flex;flex-direction:column;gap:16px;margin-top:8px}
+.oci-row{display:flex;flex-direction:column;gap:5px}
+.oci-header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.oci-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.oci-values{display:flex;align-items:center;gap:7px}
+.oci-score{font-family:var(--serif);font-size:1.3rem;font-weight:700}
+.oci-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.oci-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.oci-fill.crim{background:var(--red2)}.oci-fill.res{background:var(--teal)}
+.oci-change{font-family:var(--mono);font-size:10px;display:flex;align-items:center;gap:2px;white-space:nowrap}
+.oci-change.up{color:#e74c3c}.oci-change.dn{color:var(--teal)}.oci-change.flat{color:var(--text3)}
+.oci-prev{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px}
+
+#map-container{position:relative;background:#111;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.map-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.map-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:6px 14px;border-radius:3px;cursor:pointer;transition:all .2s}
+.map-btn:hover,.map-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+.map-legend{display:flex;gap:14px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.legend-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--text3)}
+.legend-scale{display:flex;gap:2px;align-items:center}
+.legend-swatch{width:22px;height:10px;border-radius:2px}
+.map-tt{position:absolute;background:rgba(10,10,10,.97);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:12px 16px;font-size:.78rem;pointer-events:none;z-index:200;max-width:190px;backdrop-filter:blur(6px);display:none}
+.map-tt strong{display:block;font-family:var(--serif);font-size:.95rem;color:#fff;margin-bottom:6px}
+.map-tt .tr{display:flex;justify-content:space-between;gap:14px;color:var(--text2);margin-bottom:2px}
+.map-tt .tv{color:var(--red2);font-weight:600}
+.country-path{stroke:#151515;stroke-width:.4;cursor:pointer;transition:opacity .1s}
+.country-path:hover{opacity:.7;stroke:rgba(255,255,255,.2);stroke-width:.8}
+
+.chart-controls{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.chart-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:6px 14px;border-radius:3px;cursor:pointer;transition:all .2s}
+.chart-btn:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.chart-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.cl-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;color:var(--text3)}
+.cl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+.methodology{max-width:860px;margin:0 auto;padding:0 24px 80px}
+.method-toggle{width:100%;background:transparent;border:1px solid var(--border);border-radius:4px;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:var(--text2);font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-align:left;transition:all .2s}
+.method-toggle:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.method-toggle .arrow{font-size:16px;transition:transform .3s;color:var(--text3)}
+.method-toggle.open .arrow{transform:rotate(180deg)}
+.method-body{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:32px}
+.method-body.open{display:block}
+.method-body p{color:var(--text2);font-size:.9rem;margin-bottom:20px;font-weight:300}
+
+footer{border-top:1px solid var(--border);padding:32px 24px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text3)}
+@media(max-width:640px){h1{font-size:2rem}.dashboard-grid{grid-template-columns:1fr 1fr}.lower-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="lang-switch">
+  <button class="active" onclick="setLang('en')">EN</button>
+  <button onclick="setLang('es')">ES</button>
+</div>
+
+<header>
+  <div class="kicker" data-i18n="kicker">Investigative Report · Environmental Justice</div>
+  <h1 id="main-title"></h1>
+  <p class="subtitle" data-i18n="subtitle">From the Amazon to Central American forests, criminal networks are increasingly targeting the people who stand between nature and destruction — with lethal consequences.</p>
+  <div class="byline">
+    <span data-i18n="bylineLabel">Story by</span>
+    <strong>Caroline Chaffiotte, Fernanda Gandara Marchant and Annika Mösl</strong>
+  </div>
+</header>
+
+<div class="rule"></div>
+
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="ph1">[ Placeholder — Opening paragraph ~200 words ]</p>
+  <p data-i18n-html="introP2"></p>
+  <p class="placeholder-text" data-i18n="ph3">[ Placeholder — Indigenous Peoples impact ~150 words ]</p>
+</div>
+
+<!-- VIZ 1: DASHBOARD -->
+<div class="viz-section">
+  <div class="viz-inner">
+    <div class="viz-title" data-i18n="viz1title">Country snapshot: attacks, perpetrators &amp; criminality</div>
+    <p class="viz-subtitle" data-i18n="viz1sub">Select a Latin American country to explore the full profile of attacks against environmental defenders. OCI scores: GI-TOC 2025, with 2023 comparison.</p>
+    <div class="country-selector">
+      <label data-i18n="selectLabel">Select country —</label>
+      <select id="dashboard-country" onchange="updateDashboard(this.value)">
+        <option value="Argentina">Argentina</option>
+        <option value="Bolivia">Bolivia</option>
+        <option value="Brazil">Brazil</option>
+        <option value="Chile">Chile</option>
+        <option value="Colombia" selected>Colombia</option>
+        <option value="Costa Rica">Costa Rica</option>
+        <option value="Dominican Republic">Dominican Republic</option>
+        <option value="Ecuador">Ecuador</option>
+        <option value="Guatemala">Guatemala</option>
+        <option value="Honduras">Honduras</option>
+        <option value="Mexico">Mexico</option>
+        <option value="Nicaragua">Nicaragua</option>
+        <option value="Panama">Panama</option>
+        <option value="Paraguay">Paraguay</option>
+        <option value="Peru">Peru</option>
+        <option value="Venezuela">Venezuela</option>
+      </select>
+    </div>
+    <div class="dashboard-grid">
+      <div class="stat-card"><div class="stat-label" data-i18n="cardTotal">Total attacks recorded</div><div class="stat-value red" id="d-total">—</div><div class="stat-note" data-i18n="card2012">Since 2012</div></div>
+      <div class="stat-card"><div class="stat-label" data-i18n="cardOC">Organised crime share</div><div class="stat-value amber" id="d-oc">—</div><div class="stat-note" data-i18n="cardPct">% of all attacks</div></div>
+      <div class="stat-card"><div class="stat-label" data-i18n="cardInd">Indigenous Peoples share</div><div class="stat-value teal" id="d-ind">—</div><div class="stat-note" data-i18n="cardPct">% of all victims</div></div>
+      <div class="stat-card"><div class="stat-label" data-i18n="cardOCInd">OC targeting Indigenous</div><div class="stat-value" id="d-oc-ind">—</div><div class="stat-note" data-i18n="cardPct">% of all attacks</div></div>
+      <div class="stat-card"><div class="stat-label" data-i18n="card2024">Attacks in 2024</div><div class="stat-value red" id="d-2024">—</div><div class="stat-note" data-i18n="cardLatest">Latest full year</div></div>
+    </div>
+    <div class="lower-grid">
+      <div class="stat-card"><div class="stat-label" data-i18n="cardPerp">Top perpetrator types</div><div class="perp-bars" id="perp-bars"></div></div>
+      <div class="stat-card"><div class="stat-label" data-i18n="cardOCI">Organized Crime Index 2025</div><div class="oci-card" id="oci-card"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="ph4">[ Placeholder — Country deep-dive ~200 words ]</p>
+  <p class="placeholder-text" data-i18n="ph5">[ Placeholder — Regional patterns ~150 words ]</p>
+</div>
+
+<!-- VIZ 2: WORLD MAP -->
+<div class="viz-section">
+  <div class="viz-inner">
+    <div class="viz-title" data-i18n="viz2title">A global crisis, concentrated in Latin America</div>
+    <p class="viz-subtitle" data-i18n="viz2sub">Total recorded attacks against environmental defenders by country, 2012–2024. Hover for details.</p>
+    <div class="map-controls">
+      <button class="map-btn active" id="btn-world" onclick="zoomMap('world')" data-i18n="btnWorld">World view</button>
+      <button class="map-btn" id="btn-latam" onclick="zoomMap('latam')" data-i18n="btnLatam">Focus: Latin America</button>
+    </div>
+    <div id="map-container">
+      <svg id="world-map" style="display:block;width:100%;height:auto"></svg>
+      <div id="map-tt" class="map-tt"></div>
+    </div>
+    <div class="map-legend">
+      <span class="legend-label" data-i18n="legendLabel">Attacks (total) →</span>
+      <div class="legend-scale">
+        <div class="legend-swatch" style="background:#2a2a2a;border:1px solid #444"></div>
+        <div class="legend-swatch" style="background:#5a2020"></div>
+        <div class="legend-swatch" style="background:#863020"></div>
+        <div class="legend-swatch" style="background:#b03828"></div>
+        <div class="legend-swatch" style="background:#c9392b"></div>
+        <div class="legend-swatch" style="background:#ef4d3c"></div>
+      </div>
+      <span class="legend-label">0 &nbsp;1–10 &nbsp;11–30 &nbsp;31–80 &nbsp;81–200 &nbsp;200+</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="ph6">[ Placeholder — Global context ~150 words ]</p>
+  <p class="placeholder-text" data-i18n="ph7">[ Placeholder — Structural factors ~150 words ]</p>
+</div>
+
+<!-- VIZ 3: STACKED BAR CHART -->
+<div class="viz-section">
+  <div class="viz-inner">
+    <div class="viz-title" data-i18n="viz3title">Rising violence: attack composition over time</div>
+    <p class="viz-subtitle" data-i18n="viz3sub">Annual attacks against environmental defenders, 2012–2024. Bar height = total attacks. Colours show victim/perpetrator composition.</p>
+    <div class="country-selector" style="margin-bottom:16px">
+      <label data-i18n="selectLabel">Select country —</label>
+      <select id="chart-country" onchange="updateChart(this.value)">
+        <option value="Argentina">Argentina</option>
+        <option value="Bolivia">Bolivia</option>
+        <option value="Brazil">Brazil</option>
+        <option value="Chile">Chile</option>
+        <option value="Colombia" selected>Colombia</option>
+        <option value="Costa Rica">Costa Rica</option>
+        <option value="Dominican Republic">Dominican Republic</option>
+        <option value="Ecuador">Ecuador</option>
+        <option value="Guatemala">Guatemala</option>
+        <option value="Honduras">Honduras</option>
+        <option value="Mexico">Mexico</option>
+        <option value="Nicaragua">Nicaragua</option>
+        <option value="Panama">Panama</option>
+        <option value="Paraguay">Paraguay</option>
+        <option value="Peru">Peru</option>
+        <option value="Venezuela">Venezuela</option>
+      </select>
+    </div>
+    <div class="chart-controls">
+      <button class="chart-btn active" id="mode-stacked" onclick="setChartMode('stacked')" data-i18n="modeStacked">Stacked view</button>
+      <button class="chart-btn" id="mode-oc" onclick="setChartMode('oc')" data-i18n="modeOC">OC share</button>
+      <button class="chart-btn" id="mode-ind" onclick="setChartMode('ind')" data-i18n="modeInd">Indigenous share</button>
+      <button class="chart-btn" id="mode-oci" onclick="setChartMode('oci')" data-i18n="modeOCI">OC on Indigenous</button>
+    </div>
+    <div class="chart-legend" id="chart-legend"></div>
+    <svg id="bar-chart" style="width:100%;height:340px"></svg>
+  </div>
+</div>
+
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="ph8">[ Placeholder — Policy responses ~150 words ]</p>
+  <p class="placeholder-text" data-i18n="ph9">[ Placeholder — Closing paragraph ~150 words ]</p>
+</div>
+
+<div class="methodology">
+  <button class="method-toggle" id="method-btn" onclick="toggleMethodology()">
+    <span data-i18n="methodBtn">Methodology &amp; Data Sources</span>
+    <span class="arrow">▾</span>
+  </button>
+  <div class="method-body" id="method-body">
+    <p class="placeholder-text" data-i18n="methodText1">[ Placeholder — Data sources ]</p>
+    <p class="placeholder-text" data-i18n="methodText2">[ Placeholder — Methodology and limitations ]</p>
+  </div>
+</div>
+
+<footer><span data-i18n="footerText">Data: Front Line Defenders / Global Witness · Organized Crime Index 2023 &amp; 2025 (GI-TOC) · Caroline Chaffiotte, Fernanda Gandara Marchant &amp; Annika Mösl</span></footer>
+
+<!-- DATA -->
+<script>
+const COUNTRY_STATS = {"Argentina": {"total": 8, "oc_share": 0.0, "indigenous_share": 75.0, "oc_indigenous_share": 0.0, "murders": 8, "disappearances": 0, "attacks_2024": 1}, "Bolivia": {"total": 2, "oc_share": 0.0, "indigenous_share": 50.0, "oc_indigenous_share": 0.0, "murders": 2, "disappearances": 0, "attacks_2024": 0}, "Brazil": {"total": 413, "oc_share": 8.0, "indigenous_share": 24.9, "oc_indigenous_share": 3.6, "murders": 407, "disappearances": 6, "attacks_2024": 12}, "Chile": {"total": 5, "oc_share": 0.0, "indigenous_share": 80.0, "oc_indigenous_share": 0.0, "murders": 4, "disappearances": 1, "attacks_2024": 1}, "Colombia": {"total": 509, "oc_share": 14.5, "indigenous_share": 40.5, "oc_indigenous_share": 6.3, "murders": 498, "disappearances": 11, "attacks_2024": 48}, "Costa Rica": {"total": 4, "oc_share": 25.0, "indigenous_share": 50.0, "oc_indigenous_share": 25.0, "murders": 4, "disappearances": 0, "attacks_2024": 0}, "Dominican Republic": {"total": 4, "oc_share": 0.0, "indigenous_share": 0.0, "oc_indigenous_share": 0.0, "murders": 4, "disappearances": 0, "attacks_2024": 1}, "Ecuador": {"total": 9, "oc_share": 0.0, "indigenous_share": 44.4, "oc_indigenous_share": 0.0, "murders": 8, "disappearances": 1, "attacks_2024": 3}, "Guatemala": {"total": 106, "oc_share": 6.6, "indigenous_share": 47.2, "oc_indigenous_share": 0.9, "murders": 105, "disappearances": 1, "attacks_2024": 20}, "Honduras": {"total": 155, "oc_share": 1.3, "indigenous_share": 25.8, "oc_indigenous_share": 0.0, "murders": 149, "disappearances": 6, "attacks_2024": 6}, "Mexico": {"total": 222, "oc_share": 14.0, "indigenous_share": 49.5, "oc_indigenous_share": 5.0, "murders": 183, "disappearances": 39, "attacks_2024": 19}, "Nicaragua": {"total": 74, "oc_share": 17.6, "indigenous_share": 98.6, "oc_indigenous_share": 17.6, "murders": 71, "disappearances": 3, "attacks_2024": 4}, "Panama": {"total": 5, "oc_share": 0.0, "indigenous_share": 40.0, "oc_indigenous_share": 0.0, "murders": 5, "disappearances": 0, "attacks_2024": 0}, "Paraguay": {"total": 18, "oc_share": 11.1, "indigenous_share": 5.6, "oc_indigenous_share": 0.0, "murders": 18, "disappearances": 0, "attacks_2024": 0}, "Peru": {"total": 62, "oc_share": 17.7, "indigenous_share": 54.8, "oc_indigenous_share": 14.5, "murders": 58, "disappearances": 4, "attacks_2024": 4}, "Venezuela": {"total": 23, "oc_share": 52.2, "indigenous_share": 78.3, "oc_indigenous_share": 47.8, "murders": 23, "disappearances": 0, "attacks_2024": 1}};
+const OCI_DATA      = {"Argentina": {"c23": 5.0, "r23": 5.96, "c25": 5.25, "r25": 5.67}, "Bolivia": {"c23": 4.95, "r23": 4.83, "c25": 5.12, "r25": 4.63}, "Brazil": {"c23": 6.77, "r23": 4.92, "c25": 7.07, "r25": 5.04}, "Chile": {"c23": 5.18, "r23": 6.17, "c25": 5.48, "r25": 6.17}, "Colombia": {"c23": 7.75, "r23": 5.63, "c25": 7.82, "r25": 5.46}, "Costa Rica": {"c23": 5.53, "r23": 5.63, "c25": 5.9, "r25": 5.63}, "Dominican Republic": {"c23": 5.02, "r23": 4.79, "c25": 5.17, "r25": 4.92}, "Ecuador": {"c23": 7.07, "r23": 4.88, "c25": 7.48, "r25": 4.46}, "Guatemala": {"c23": 6.6, "r23": 4.08, "c25": 6.77, "r25": 4.0}, "Honduras": {"c23": 7.05, "r23": 4.08, "c25": 7.1, "r25": 3.92}, "Mexico": {"c23": 7.57, "r23": 4.21, "c25": 7.68, "r25": 4.5}, "Nicaragua": {"c23": 5.72, "r23": 2.08, "c25": 5.73, "r25": 2.0}, "Panama": {"c23": 6.98, "r23": 4.67, "c25": 6.93, "r25": 4.71}, "Paraguay": {"c23": 7.52, "r23": 3.42, "c25": 7.48, "r25": 3.29}, "Peru": {"c23": 6.4, "r23": 4.38, "c25": 6.62, "r25": 4.46}, "Venezuela": {"c23": 6.72, "r23": 1.88, "c25": 6.97, "r25": 1.88}};
+const PERP_DATA     = {"Argentina": [{"label": "Police", "count": 4, "pct": 50.0, "color": "#2980b9"}, {"label": "Hitmen", "count": 2, "pct": 25.0, "color": "#c0392b"}, {"label": "Private security", "count": 1, "pct": 12.5, "color": "#16a085"}, {"label": "Others", "count": 1, "pct": 12.5, "color": "#444"}], "Bolivia": [{"label": "Others", "count": 1, "pct": 50.0, "color": "#444"}, {"label": "Hitmen", "count": 1, "pct": 50.0, "color": "#c0392b"}], "Brazil": [{"label": "Unknown", "count": 161, "pct": 37.4, "color": "#555"}, {"label": "Hitmen", "count": 96, "pct": 22.3, "color": "#c0392b"}, {"label": "Landowners", "count": 50, "pct": 11.6, "color": "#27ae60"}, {"label": "Others", "count": 36, "pct": 8.4, "color": "#444"}, {"label": "Organised crime", "count": 33, "pct": 7.7, "color": "#e74c3c"}], "Chile": [{"label": "Unknown", "count": 2, "pct": 40.0, "color": "#555"}, {"label": "Landowners", "count": 1, "pct": 20.0, "color": "#27ae60"}, {"label": "Armed forces", "count": 1, "pct": 20.0, "color": "#1a5276"}, {"label": "Police", "count": 1, "pct": 20.0, "color": "#2980b9"}], "Colombia": [{"label": "Hitmen", "count": 148, "pct": 28.9, "color": "#c0392b"}, {"label": "Private military", "count": 143, "pct": 27.9, "color": "#7f8c8d"}, {"label": "Unknown", "count": 125, "pct": 24.4, "color": "#555"}, {"label": "Organised crime", "count": 74, "pct": 14.5, "color": "#e74c3c"}, {"label": "Police", "count": 9, "pct": 1.8, "color": "#2980b9"}], "Costa Rica": [{"label": "Unknown", "count": 2, "pct": 50.0, "color": "#555"}, {"label": "Organised crime", "count": 1, "pct": 25.0, "color": "#e74c3c"}, {"label": "Poachers", "count": 1, "pct": 25.0, "color": "#f39c12"}], "Dominican Republic": [{"label": "Unknown", "count": 3, "pct": 75.0, "color": "#555"}, {"label": "Corporations", "count": 1, "pct": 25.0, "color": "#d35400"}], "Ecuador": [{"label": "Unknown", "count": 6, "pct": 66.7, "color": "#555"}, {"label": "Hitmen", "count": 2, "pct": 22.2, "color": "#c0392b"}, {"label": "Gov. officials", "count": 1, "pct": 11.1, "color": "#8e44ad"}], "Guatemala": [{"label": "Unknown", "count": 45, "pct": 42.1, "color": "#555"}, {"label": "Hitmen", "count": 34, "pct": 31.8, "color": "#c0392b"}, {"label": "Organised crime", "count": 7, "pct": 6.5, "color": "#e74c3c"}, {"label": "Police", "count": 6, "pct": 5.6, "color": "#2980b9"}, {"label": "Private security", "count": 5, "pct": 4.7, "color": "#16a085"}], "Honduras": [{"label": "Hitmen", "count": 54, "pct": 41.9, "color": "#c0392b"}, {"label": "Unknown", "count": 44, "pct": 34.1, "color": "#555"}, {"label": "Police", "count": 7, "pct": 5.4, "color": "#2980b9"}, {"label": "Armed forces", "count": 7, "pct": 5.4, "color": "#1a5276"}, {"label": "Private security", "count": 4, "pct": 3.1, "color": "#16a085"}], "Mexico": [{"label": "Hitmen", "count": 73, "pct": 33.0, "color": "#c0392b"}, {"label": "Unknown", "count": 71, "pct": 32.1, "color": "#555"}, {"label": "Organised crime", "count": 31, "pct": 14.0, "color": "#e74c3c"}, {"label": "Police", "count": 15, "pct": 6.8, "color": "#2980b9"}, {"label": "Private military", "count": 14, "pct": 6.3, "color": "#7f8c8d"}], "Nicaragua": [{"label": "Others", "count": 44, "pct": 57.1, "color": "#444"}, {"label": "Organised crime", "count": 13, "pct": 16.9, "color": "#e74c3c"}, {"label": "Hitmen", "count": 9, "pct": 11.7, "color": "#c0392b"}, {"label": "Private military", "count": 5, "pct": 6.5, "color": "#7f8c8d"}, {"label": "Unknown", "count": 4, "pct": 5.2, "color": "#555"}], "Panama": [{"label": "Others", "count": 3, "pct": 60.0, "color": "#444"}, {"label": "Unknown", "count": 2, "pct": 40.0, "color": "#555"}], "Paraguay": [{"label": "Police", "count": 10, "pct": 55.6, "color": "#2980b9"}, {"label": "Hitmen", "count": 3, "pct": 16.7, "color": "#c0392b"}, {"label": "Private security", "count": 2, "pct": 11.1, "color": "#16a085"}, {"label": "Organised crime", "count": 2, "pct": 11.1, "color": "#e74c3c"}, {"label": "Others", "count": 1, "pct": 5.6, "color": "#444"}], "Peru": [{"label": "Police", "count": 23, "pct": 37.1, "color": "#2980b9"}, {"label": "Unknown", "count": 18, "pct": 29.0, "color": "#555"}, {"label": "Organised crime", "count": 11, "pct": 17.7, "color": "#e74c3c"}, {"label": "Hitmen", "count": 5, "pct": 8.1, "color": "#c0392b"}, {"label": "Others", "count": 5, "pct": 8.1, "color": "#444"}], "Venezuela": [{"label": "Organised crime", "count": 12, "pct": 35.3, "color": "#e74c3c"}, {"label": "Armed forces", "count": 8, "pct": 23.5, "color": "#1a5276"}, {"label": "Hitmen", "count": 6, "pct": 17.6, "color": "#c0392b"}, {"label": "Private military", "count": 3, "pct": 8.8, "color": "#7f8c8d"}, {"label": "Landowners", "count": 3, "pct": 8.8, "color": "#27ae60"}]};
+const TIMELINE      = {"Argentina": [{"y": 2012, "t": 3, "oc_n": 0, "ind_n": 3, "oci_n": 0, "oc_only": 0, "ind_only": 3, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2013, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 2, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2020, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2021, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2022, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2023, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2024, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}], "Bolivia": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2022, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2023, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2024, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}], "Brazil": [{"y": 2012, "t": 36, "oc_n": 0, "ind_n": 8, "oci_n": 0, "oc_only": 0, "ind_only": 8, "both": 0, "neither": 28, "oc_pct": 0.0, "ind_pct": 22.2, "oci_pct": 0.0}, {"y": 2013, "t": 32, "oc_n": 0, "ind_n": 15, "oci_n": 0, "oc_only": 0, "ind_only": 15, "both": 0, "neither": 17, "oc_pct": 0.0, "ind_pct": 46.9, "oci_pct": 0.0}, {"y": 2014, "t": 29, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 25, "oc_pct": 0.0, "ind_pct": 13.8, "oci_pct": 0.0}, {"y": 2015, "t": 48, "oc_n": 0, "ind_n": 6, "oci_n": 0, "oc_only": 0, "ind_only": 6, "both": 0, "neither": 42, "oc_pct": 0.0, "ind_pct": 12.5, "oci_pct": 0.0}, {"y": 2016, "t": 49, "oc_n": 1, "ind_n": 15, "oci_n": 0, "oc_only": 1, "ind_only": 15, "both": 0, "neither": 33, "oc_pct": 2.0, "ind_pct": 30.6, "oci_pct": 0.0}, {"y": 2017, "t": 58, "oc_n": 17, "ind_n": 4, "oci_n": 2, "oc_only": 15, "ind_only": 2, "both": 2, "neither": 39, "oc_pct": 29.3, "ind_pct": 6.9, "oci_pct": 3.4}, {"y": 2018, "t": 20, "oc_n": 1, "ind_n": 1, "oci_n": 1, "oc_only": 0, "ind_only": 0, "both": 1, "neither": 19, "oc_pct": 5.0, "ind_pct": 5.0, "oci_pct": 5.0}, {"y": 2019, "t": 24, "oc_n": 5, "ind_n": 10, "oci_n": 5, "oc_only": 0, "ind_only": 5, "both": 5, "neither": 14, "oc_pct": 20.8, "ind_pct": 41.7, "oci_pct": 20.8}, {"y": 2020, "t": 20, "oc_n": 8, "ind_n": 10, "oci_n": 7, "oc_only": 1, "ind_only": 3, "both": 7, "neither": 9, "oc_pct": 40.0, "ind_pct": 50.0, "oci_pct": 35.0}, {"y": 2021, "t": 26, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 22, "oc_pct": 0.0, "ind_pct": 15.4, "oci_pct": 0.0}, {"y": 2022, "t": 34, "oc_n": 0, "ind_n": 10, "oci_n": 0, "oc_only": 0, "ind_only": 10, "both": 0, "neither": 24, "oc_pct": 0.0, "ind_pct": 29.4, "oci_pct": 0.0}, {"y": 2023, "t": 25, "oc_n": 1, "ind_n": 12, "oci_n": 0, "oc_only": 1, "ind_only": 12, "both": 0, "neither": 12, "oc_pct": 4.0, "ind_pct": 48.0, "oci_pct": 0.0}, {"y": 2024, "t": 12, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 8, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}], "Chile": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2017, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2018, "t": 2, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2019, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2022, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2023, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2024, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}], "Colombia": [{"y": 2012, "t": 9, "oc_n": 0, "ind_n": 5, "oci_n": 0, "oc_only": 0, "ind_only": 5, "both": 0, "neither": 4, "oc_pct": 0.0, "ind_pct": 55.6, "oci_pct": 0.0}, {"y": 2013, "t": 15, "oc_n": 1, "ind_n": 4, "oci_n": 0, "oc_only": 1, "ind_only": 4, "both": 0, "neither": 10, "oc_pct": 6.7, "ind_pct": 26.7, "oci_pct": 0.0}, {"y": 2014, "t": 25, "oc_n": 0, "ind_n": 13, "oci_n": 0, "oc_only": 0, "ind_only": 13, "both": 0, "neither": 12, "oc_pct": 0.0, "ind_pct": 52.0, "oci_pct": 0.0}, {"y": 2015, "t": 26, "oc_n": 0, "ind_n": 8, "oci_n": 0, "oc_only": 0, "ind_only": 8, "both": 0, "neither": 18, "oc_pct": 0.0, "ind_pct": 30.8, "oci_pct": 0.0}, {"y": 2016, "t": 36, "oc_n": 1, "ind_n": 15, "oci_n": 1, "oc_only": 0, "ind_only": 14, "both": 1, "neither": 21, "oc_pct": 2.8, "ind_pct": 41.7, "oci_pct": 2.8}, {"y": 2017, "t": 24, "oc_n": 1, "ind_n": 12, "oci_n": 1, "oc_only": 0, "ind_only": 11, "both": 1, "neither": 12, "oc_pct": 4.2, "ind_pct": 50.0, "oci_pct": 4.2}, {"y": 2018, "t": 25, "oc_n": 3, "ind_n": 9, "oci_n": 1, "oc_only": 2, "ind_only": 8, "both": 1, "neither": 14, "oc_pct": 12.0, "ind_pct": 36.0, "oci_pct": 4.0}, {"y": 2019, "t": 64, "oc_n": 4, "ind_n": 32, "oci_n": 1, "oc_only": 3, "ind_only": 31, "both": 1, "neither": 29, "oc_pct": 6.2, "ind_pct": 50.0, "oci_pct": 1.6}, {"y": 2020, "t": 65, "oc_n": 0, "ind_n": 21, "oci_n": 0, "oc_only": 0, "ind_only": 21, "both": 0, "neither": 44, "oc_pct": 0.0, "ind_pct": 32.3, "oci_pct": 0.0}, {"y": 2021, "t": 33, "oc_n": 1, "ind_n": 16, "oci_n": 0, "oc_only": 1, "ind_only": 16, "both": 0, "neither": 16, "oc_pct": 3.0, "ind_pct": 48.5, "oci_pct": 0.0}, {"y": 2022, "t": 60, "oc_n": 0, "ind_n": 23, "oci_n": 0, "oc_only": 0, "ind_only": 23, "both": 0, "neither": 37, "oc_pct": 0.0, "ind_pct": 38.3, "oci_pct": 0.0}, {"y": 2023, "t": 79, "oc_n": 39, "ind_n": 29, "oci_n": 17, "oc_only": 22, "ind_only": 12, "both": 17, "neither": 28, "oc_pct": 49.4, "ind_pct": 36.7, "oci_pct": 21.5}, {"y": 2024, "t": 48, "oc_n": 24, "ind_n": 19, "oci_n": 11, "oc_only": 13, "ind_only": 8, "both": 11, "neither": 16, "oc_pct": 50.0, "ind_pct": 39.6, "oci_pct": 22.9}], "Costa Rica": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2014, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2020, "t": 1, "oc_n": 1, "ind_n": 1, "oci_n": 1, "oc_only": 0, "ind_only": 0, "both": 1, "neither": 0, "oc_pct": 100.0, "ind_pct": 100.0, "oci_pct": 100.0}, {"y": 2021, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2022, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2023, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2024, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}], "Dominican Republic": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 2, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2022, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2023, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2024, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}], "Ecuador": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2014, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 3, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2022, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2023, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2024, "t": 3, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}], "Guatemala": [{"y": 2012, "t": 6, "oc_n": 0, "ind_n": 5, "oci_n": 0, "oc_only": 0, "ind_only": 5, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 83.3, "oci_pct": 0.0}, {"y": 2013, "t": 6, "oc_n": 1, "ind_n": 5, "oci_n": 1, "oc_only": 0, "ind_only": 4, "both": 1, "neither": 1, "oc_pct": 16.7, "ind_pct": 83.3, "oci_pct": 16.7}, {"y": 2014, "t": 5, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 80.0, "oci_pct": 0.0}, {"y": 2015, "t": 10, "oc_n": 0, "ind_n": 6, "oci_n": 0, "oc_only": 0, "ind_only": 6, "both": 0, "neither": 4, "oc_pct": 0.0, "ind_pct": 60.0, "oci_pct": 0.0}, {"y": 2016, "t": 6, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 5, "oc_pct": 0.0, "ind_pct": 16.7, "oci_pct": 0.0}, {"y": 2017, "t": 3, "oc_n": 0, "ind_n": 2, "oci_n": 0, "oc_only": 0, "ind_only": 2, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 66.7, "oci_pct": 0.0}, {"y": 2018, "t": 15, "oc_n": 0, "ind_n": 12, "oci_n": 0, "oc_only": 0, "ind_only": 12, "both": 0, "neither": 3, "oc_pct": 0.0, "ind_pct": 80.0, "oci_pct": 0.0}, {"y": 2019, "t": 12, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 8, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2020, "t": 13, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 9, "oc_pct": 0.0, "ind_pct": 30.8, "oci_pct": 0.0}, {"y": 2021, "t": 4, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 3, "oc_pct": 0.0, "ind_pct": 25.0, "oci_pct": 0.0}, {"y": 2022, "t": 2, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2023, "t": 4, "oc_n": 0, "ind_n": 2, "oci_n": 0, "oc_only": 0, "ind_only": 2, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2024, "t": 20, "oc_n": 6, "ind_n": 4, "oci_n": 0, "oc_only": 6, "ind_only": 4, "both": 0, "neither": 10, "oc_pct": 30.0, "ind_pct": 20.0, "oci_pct": 0.0}], "Honduras": [{"y": 2012, "t": 25, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 25, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2013, "t": 10, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 6, "oc_pct": 0.0, "ind_pct": 40.0, "oci_pct": 0.0}, {"y": 2014, "t": 12, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 8, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2015, "t": 8, "oc_n": 0, "ind_n": 6, "oci_n": 0, "oc_only": 0, "ind_only": 6, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 75.0, "oci_pct": 0.0}, {"y": 2016, "t": 14, "oc_n": 0, "ind_n": 5, "oci_n": 0, "oc_only": 0, "ind_only": 5, "both": 0, "neither": 9, "oc_pct": 0.0, "ind_pct": 35.7, "oci_pct": 0.0}, {"y": 2017, "t": 5, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 4, "oc_pct": 0.0, "ind_pct": 20.0, "oci_pct": 0.0}, {"y": 2018, "t": 4, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 4, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2019, "t": 14, "oc_n": 0, "ind_n": 6, "oci_n": 0, "oc_only": 0, "ind_only": 6, "both": 0, "neither": 8, "oc_pct": 0.0, "ind_pct": 42.9, "oci_pct": 0.0}, {"y": 2020, "t": 17, "oc_n": 0, "ind_n": 3, "oci_n": 0, "oc_only": 0, "ind_only": 3, "both": 0, "neither": 14, "oc_pct": 0.0, "ind_pct": 17.6, "oci_pct": 0.0}, {"y": 2021, "t": 8, "oc_n": 0, "ind_n": 2, "oci_n": 0, "oc_only": 0, "ind_only": 2, "both": 0, "neither": 6, "oc_pct": 0.0, "ind_pct": 25.0, "oci_pct": 0.0}, {"y": 2022, "t": 14, "oc_n": 0, "ind_n": 5, "oci_n": 0, "oc_only": 0, "ind_only": 5, "both": 0, "neither": 9, "oc_pct": 0.0, "ind_pct": 35.7, "oci_pct": 0.0}, {"y": 2023, "t": 18, "oc_n": 1, "ind_n": 4, "oci_n": 0, "oc_only": 1, "ind_only": 4, "both": 0, "neither": 13, "oc_pct": 5.6, "ind_pct": 22.2, "oci_pct": 0.0}, {"y": 2024, "t": 6, "oc_n": 1, "ind_n": 0, "oci_n": 0, "oc_only": 1, "ind_only": 0, "both": 0, "neither": 5, "oc_pct": 16.7, "ind_pct": 0.0, "oci_pct": 0.0}], "Mexico": [{"y": 2012, "t": 10, "oc_n": 2, "ind_n": 4, "oci_n": 0, "oc_only": 2, "ind_only": 4, "both": 0, "neither": 4, "oc_pct": 20.0, "ind_pct": 40.0, "oci_pct": 0.0}, {"y": 2013, "t": 3, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 3, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2014, "t": 3, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2015, "t": 4, "oc_n": 0, "ind_n": 2, "oci_n": 0, "oc_only": 0, "ind_only": 2, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2016, "t": 3, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2017, "t": 15, "oc_n": 1, "ind_n": 13, "oci_n": 1, "oc_only": 0, "ind_only": 12, "both": 1, "neither": 2, "oc_pct": 6.7, "ind_pct": 86.7, "oci_pct": 6.7}, {"y": 2018, "t": 14, "oc_n": 2, "ind_n": 12, "oci_n": 1, "oc_only": 1, "ind_only": 11, "both": 1, "neither": 1, "oc_pct": 14.3, "ind_pct": 85.7, "oci_pct": 7.1}, {"y": 2019, "t": 18, "oc_n": 2, "ind_n": 8, "oci_n": 2, "oc_only": 0, "ind_only": 6, "both": 2, "neither": 10, "oc_pct": 11.1, "ind_pct": 44.4, "oci_pct": 11.1}, {"y": 2020, "t": 30, "oc_n": 1, "ind_n": 15, "oci_n": 0, "oc_only": 1, "ind_only": 15, "both": 0, "neither": 14, "oc_pct": 3.3, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2021, "t": 54, "oc_n": 9, "ind_n": 23, "oci_n": 1, "oc_only": 8, "ind_only": 22, "both": 1, "neither": 23, "oc_pct": 16.7, "ind_pct": 42.6, "oci_pct": 1.9}, {"y": 2022, "t": 31, "oc_n": 0, "ind_n": 15, "oci_n": 0, "oc_only": 0, "ind_only": 15, "both": 0, "neither": 16, "oc_pct": 0.0, "ind_pct": 48.4, "oci_pct": 0.0}, {"y": 2023, "t": 18, "oc_n": 4, "ind_n": 13, "oci_n": 4, "oc_only": 0, "ind_only": 9, "both": 4, "neither": 5, "oc_pct": 22.2, "ind_pct": 72.2, "oci_pct": 22.2}, {"y": 2024, "t": 19, "oc_n": 10, "ind_n": 3, "oci_n": 2, "oc_only": 8, "ind_only": 1, "both": 2, "neither": 8, "oc_pct": 52.6, "ind_pct": 15.8, "oci_pct": 10.5}], "Nicaragua": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 12, "oc_n": 0, "ind_n": 12, "oci_n": 0, "oc_only": 0, "ind_only": 12, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2016, "t": 8, "oc_n": 0, "ind_n": 7, "oci_n": 0, "oc_only": 0, "ind_only": 7, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 87.5, "oci_pct": 0.0}, {"y": 2017, "t": 4, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 5, "oc_n": 0, "ind_n": 5, "oci_n": 0, "oc_only": 0, "ind_only": 5, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2020, "t": 12, "oc_n": 0, "ind_n": 12, "oci_n": 0, "oc_only": 0, "ind_only": 12, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2021, "t": 15, "oc_n": 13, "ind_n": 15, "oci_n": 13, "oc_only": 0, "ind_only": 2, "both": 13, "neither": 0, "oc_pct": 86.7, "ind_pct": 100.0, "oci_pct": 86.7}, {"y": 2022, "t": 3, "oc_n": 0, "ind_n": 3, "oci_n": 0, "oc_only": 0, "ind_only": 3, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2023, "t": 10, "oc_n": 0, "ind_n": 10, "oci_n": 0, "oc_only": 0, "ind_only": 10, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2024, "t": 4, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}], "Panama": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2022, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2023, "t": 4, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 3, "oc_pct": 0.0, "ind_pct": 25.0, "oci_pct": 0.0}, {"y": 2024, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}], "Paraguay": [{"y": 2012, "t": 10, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 10, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2013, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2014, "t": 3, "oc_n": 2, "ind_n": 0, "oci_n": 0, "oc_only": 2, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 66.7, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2022, "t": 3, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 3, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2023, "t": 2, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2024, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}], "Peru": [{"y": 2012, "t": 9, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 9, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2013, "t": 3, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2014, "t": 9, "oc_n": 0, "ind_n": 7, "oci_n": 0, "oc_only": 0, "ind_only": 7, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 77.8, "oci_pct": 0.0}, {"y": 2015, "t": 12, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 8, "oc_pct": 0.0, "ind_pct": 33.3, "oci_pct": 0.0}, {"y": 2016, "t": 2, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 50.0, "oci_pct": 0.0}, {"y": 2017, "t": 2, "oc_n": 2, "ind_n": 0, "oci_n": 0, "oc_only": 2, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 100.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2018, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2019, "t": 1, "oc_n": 1, "ind_n": 1, "oci_n": 1, "oc_only": 0, "ind_only": 0, "both": 1, "neither": 0, "oc_pct": 100.0, "ind_pct": 100.0, "oci_pct": 100.0}, {"y": 2020, "t": 6, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 2, "oc_pct": 0.0, "ind_pct": 66.7, "oci_pct": 0.0}, {"y": 2021, "t": 7, "oc_n": 3, "ind_n": 7, "oci_n": 3, "oc_only": 0, "ind_only": 4, "both": 3, "neither": 0, "oc_pct": 42.9, "ind_pct": 100.0, "oci_pct": 42.9}, {"y": 2022, "t": 3, "oc_n": 0, "ind_n": 2, "oci_n": 0, "oc_only": 0, "ind_only": 2, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 66.7, "oci_pct": 0.0}, {"y": 2023, "t": 4, "oc_n": 3, "ind_n": 3, "oci_n": 3, "oc_only": 0, "ind_only": 0, "both": 3, "neither": 1, "oc_pct": 75.0, "ind_pct": 75.0, "oci_pct": 75.0}, {"y": 2024, "t": 4, "oc_n": 2, "ind_n": 4, "oci_n": 2, "oc_only": 0, "ind_only": 2, "both": 2, "neither": 0, "oc_pct": 50.0, "ind_pct": 100.0, "oci_pct": 50.0}], "Venezuela": [{"y": 2012, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2013, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2014, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2015, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2016, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2017, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2018, "t": 3, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 3, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2019, "t": 8, "oc_n": 8, "ind_n": 8, "oci_n": 8, "oc_only": 0, "ind_only": 0, "both": 8, "neither": 0, "oc_pct": 100.0, "ind_pct": 100.0, "oci_pct": 100.0}, {"y": 2020, "t": 0, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 0, "oc_pct": 0, "ind_pct": 0, "oci_pct": 0}, {"y": 2021, "t": 4, "oc_n": 4, "ind_n": 3, "oci_n": 3, "oc_only": 1, "ind_only": 0, "both": 3, "neither": 0, "oc_pct": 100.0, "ind_pct": 75.0, "oci_pct": 75.0}, {"y": 2022, "t": 4, "oc_n": 0, "ind_n": 4, "oci_n": 0, "oc_only": 0, "ind_only": 4, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}, {"y": 2023, "t": 1, "oc_n": 0, "ind_n": 0, "oci_n": 0, "oc_only": 0, "ind_only": 0, "both": 0, "neither": 1, "oc_pct": 0.0, "ind_pct": 0.0, "oci_pct": 0.0}, {"y": 2024, "t": 1, "oc_n": 0, "ind_n": 1, "oci_n": 0, "oc_only": 0, "ind_only": 1, "both": 0, "neither": 0, "oc_pct": 0.0, "ind_pct": 100.0, "oci_pct": 0.0}]};
+const WORLD_DATA    = [{"country": "Argentina", "total": 8, "lat": -26.521975, "lon": -62.577061, "attacks_2024": 1}, {"country": "Australia", "total": 1, "lat": -29.149892, "lon": 150.295948, "attacks_2024": 0}, {"country": "Bangladesh", "total": 7, "lat": 23.06885, "lon": 90.680529, "attacks_2024": 0}, {"country": "Bolivia", "total": 2, "lat": -16.070583, "lon": -61.016765, "attacks_2024": 0}, {"country": "Brazil", "total": 413, "lat": -5.629632, "lon": -49.273487, "attacks_2024": 12}, {"country": "Burkina Faso", "total": 2, "lat": 13.38006, "lon": 0.66799, "attacks_2024": 0}, {"country": "Cambodia", "total": 11, "lat": 13.077629, "lon": 104.23858, "attacks_2024": 1}, {"country": "Cameroon", "total": 2, "lat": 8.397517, "lon": 14.165625, "attacks_2024": 1}, {"country": "Canada", "total": 1, "lat": 43.653225, "lon": -79.383186, "attacks_2024": 0}, {"country": "Chad", "total": 5, "lat": 10.89211, "lon": 19.82177, "attacks_2024": 0}, {"country": "Chile", "total": 5, "lat": -39.709646, "lon": -72.747157, "attacks_2024": 1}, {"country": "Colombia", "total": 509, "lat": 2.623652, "lon": -76.569014, "attacks_2024": 48}, {"country": "Costa Rica", "total": 4, "lat": 9.068111, "lon": -83.287139, "attacks_2024": 0}, {"country": "Democratic Republic of the Congo", "total": 78, "lat": -9.151516, "lon": 25.8415, "attacks_2024": 4}, {"country": "Dominican Republic", "total": 4, "lat": 18.906758, "lon": -70.742187, "attacks_2024": 1}, {"country": "Ecuador", "total": 9, "lat": 0.806131, "lon": -78.9678, "attacks_2024": 3}, {"country": "France", "total": 1, "lat": 43.852799, "lon": 1.810783, "attacks_2024": 0}, {"country": "Gabon", "total": 1, "lat": 1.012406, "lon": 13.950491, "attacks_2024": 0}, {"country": "Gambia", "total": 2, "lat": 13.259011, "lon": -16.521581, "attacks_2024": 0}, {"country": "Ghana", "total": 2, "lat": 5.635041, "lon": 0.016924, "attacks_2024": 0}, {"country": "Guatemala", "total": 106, "lat": 14.13673, "lon": -90.009866, "attacks_2024": 20}, {"country": "Honduras", "total": 155, "lat": 15.919147, "lon": -85.956541, "attacks_2024": 6}, {"country": "India", "total": 87, "lat": 17.421574, "lon": 78.449013, "attacks_2024": 1}, {"country": "Indonesia", "total": 25, "lat": 3.559076, "lon": 98.738304, "attacks_2024": 5}, {"country": "Iran", "total": 9, "lat": 35.689198, "lon": 51.388973, "attacks_2024": 0}, {"country": "Iraq", "total": 1, "lat": 30.51923, "lon": 47.760948, "attacks_2024": 0}, {"country": "Ireland", "total": 1, "lat": 52.27019, "lon": -8.5977, "attacks_2024": 0}, {"country": "Kazakhstan", "total": 3, "lat": 51.860401, "lon": 69.807037, "attacks_2024": 0}, {"country": "Kenya", "total": 6, "lat": -1.23026, "lon": 36.84144, "attacks_2024": 0}, {"country": "Kiribati", "total": 1, "lat": -3.370417, "lon": -168.734039, "attacks_2024": 0}, {"country": "Laos", "total": 1, "lat": 17.897033, "lon": 102.639675, "attacks_2024": 0}, {"country": "Liberia", "total": 6, "lat": 7.012047, "lon": -11.117818, "attacks_2024": 3}, {"country": "Madagascar", "total": 3, "lat": -19.193765, "lon": 48.007645, "attacks_2024": 1}, {"country": "Malawi", "total": 1, "lat": -15.936139, "lon": 34.641381, "attacks_2024": 0}, {"country": "Malaysia", "total": 1, "lat": 1.553278, "lon": 110.359213, "attacks_2024": 0}, {"country": "Mexico", "total": 222, "lat": 20.616628, "lon": -103.327808, "attacks_2024": 19}, {"country": "Mozambique", "total": 1, "lat": -16.117058, "lon": 33.723831, "attacks_2024": 0}, {"country": "Myanmar", "total": 8, "lat": 22.331323, "lon": 96.80027, "attacks_2024": 0}, {"country": "Nepal", "total": 1, "lat": 26.833168, "lon": 86.054651, "attacks_2024": 0}, {"country": "Nicaragua", "total": 74, "lat": 13.54327, "lon": -85.538604, "attacks_2024": 4}, {"country": "Pakistan", "total": 5, "lat": 33.684422, "lon": 73.047882, "attacks_2024": 0}, {"country": "Panama", "total": 5, "lat": 8.591924, "lon": -79.853346, "attacks_2024": 0}, {"country": "Papua New Guinea", "total": 4, "lat": -5.463423, "lon": 143.145372, "attacks_2024": 0}, {"country": "Paraguay", "total": 18, "lat": -22.651697, "lon": -56.025103, "attacks_2024": 0}, {"country": "Peru", "total": 62, "lat": -12.38655, "lon": -71.074051, "attacks_2024": 4}, {"country": "Philippines", "total": 306, "lat": 9.260908, "lon": 125.968701, "attacks_2024": 8}, {"country": "Romania", "total": 2, "lat": 47.45086, "lon": 23.86807, "attacks_2024": 0}, {"country": "Russia", "total": 5, "lat": 55.114497, "lon": 61.527456, "attacks_2024": 1}, {"country": "Rwanda", "total": 1, "lat": -1.955216, "lon": 30.082573, "attacks_2024": 0}, {"country": "Saudi Arabia", "total": 1, "lat": 24.77408, "lon": 46.81529, "attacks_2024": 0}, {"country": "Senegal", "total": 1, "lat": 12.771943, "lon": -15.668087, "attacks_2024": 0}, {"country": "South Africa", "total": 6, "lat": -24.407327, "lon": 31.31376, "attacks_2024": 0}, {"country": "Spain", "total": 2, "lat": 41.494152, "lon": 0.674318, "attacks_2024": 0}, {"country": "Sri Lanka", "total": 1, "lat": 7.22855, "lon": 81.471764, "attacks_2024": 0}, {"country": "Tanzania", "total": 2, "lat": -6.747371, "lon": 39.281697, "attacks_2024": 0}, {"country": "Thailand", "total": 13, "lat": 18.02427, "lon": 102.37252, "attacks_2024": 0}, {"country": "Türkiye", "total": 3, "lat": 41.392384, "lon": 41.538316, "attacks_2024": 1}, {"country": "Uganda", "total": 5, "lat": 0.61147, "lon": 30.64366, "attacks_2024": 0}, {"country": "Ukraine", "total": 4, "lat": 46.650452, "lon": 32.608181, "attacks_2024": 0}, {"country": "United States of America", "total": 2, "lat": 33.758695, "lon": -84.388903, "attacks_2024": 0}, {"country": "Venezuela", "total": 23, "lat": 4.622204, "lon": -65.224741, "attacks_2024": 1}, {"country": "Vietnam", "total": 1, "lat": 11.706528, "lon": 109.116657, "attacks_2024": 0}, {"country": "Zambia", "total": 1, "lat": -14.241257, "lon": 31.319849, "attacks_2024": 0}, {"country": "Zimbabwe", "total": 1, "lat": -21.805162, "lon": 31.719546, "attacks_2024": 0}];
+</script>
+
+<script>
+const I18N={
+  en:{
+    kicker:"Investigative Report · Environmental Justice",
+    subtitle:"From the Amazon to Central American forests, criminal networks are increasingly targeting the people who stand between nature and destruction — with lethal consequences.",
+    bylineLabel:"Story by",
+    ph1:"[ Placeholder — Opening paragraph ~200 words ]",
+    ph3:"[ Placeholder — Indigenous Peoples impact ~150 words ]",
+    ph4:"[ Placeholder — Country deep-dive ~200 words ]",
+    ph5:"[ Placeholder — Regional patterns ~150 words ]",
+    ph6:"[ Placeholder — Global context ~150 words ]",
+    ph7:"[ Placeholder — Structural factors ~150 words ]",
+    ph8:"[ Placeholder — Policy responses ~150 words ]",
+    ph9:"[ Placeholder — Closing paragraph ~150 words ]",
+    viz1title:"Country snapshot: attacks, perpetrators & criminality",
+    viz1sub:"Select a Latin American country to explore the full profile of attacks against environmental defenders. OCI scores: GI-TOC 2025, with 2023 comparison.",
+    viz2title:"A global crisis, concentrated in Latin America",
+    viz2sub:"Total recorded attacks against environmental defenders by country, 2012–2024. Hover for details.",
+    viz3title:"Rising violence: attack composition over time",
+    viz3sub:"Annual attacks against environmental defenders, 2012–2024. Bar height = total attacks. Colours show victim/perpetrator composition.",
+    selectLabel:"Select country —",
+    cardTotal:"Total attacks",card2012:"Since 2012",cardOC:"Organised crime share",
+    cardPct:"% of all attacks",cardInd:"Indigenous Peoples share",cardOCInd:"OC targeting Indigenous",
+    card2024:"Attacks in 2024",cardLatest:"Latest full year",
+    cardPerp:"Top perpetrator types",cardOCI:"Organized Crime Index 2025",
+    btnWorld:"World view",btnLatam:"Focus: Latin America",legendLabel:"Attacks (total) →",
+    modeStacked:"Stacked view",modeOC:"OC share",modeInd:"Indigenous share",modeOCI:"OC on Indigenous",
+    methodBtn:"Methodology & Data Sources",
+    methodText1:"[ Placeholder — Data sources ]",methodText2:"[ Placeholder — Methodology & limitations ]",
+    footerText:"Data: Front Line Defenders / Global Witness · Organized Crime Index 2023 & 2025 (GI-TOC) · Caroline Chaffiotte, Fernanda Gandara Marchant & Annika Mösl",
+    ttTotal:"Total attacks",ttYear:"In 2024",
+    criminality:"Criminality",resilience:"Resilience",since2023:"vs. 2023",
+    stackNeither:"Other / Unknown",stackOC:"Organised crime only",stackInd:"Indigenous victims",stackBoth:"OC + Indigenous",
+    glossED:"A person who, individually or collectively, acts to promote or protect human rights related to the environment — including land, water, forests and climate. They are often community members, Indigenous leaders or activists.",
+    glossOC:"Criminal networks and mafia-style groups that use violence, corruption and intimidation to control illegal economies — including illegal mining, logging, drug trafficking and land grabbing — often at the expense of environmental defenders.",
+    titleHtml:`How <span class="gloss">Organized Crime<span class="gloss-tip"></span></span> <em>Threatens</em> <span class="gloss">Environmental Defenders<span class="gloss-tip"></span></span> in Latin America`,
+    introP2:`In Colombia alone, <span class="gloss">environmental defenders<span class="gloss-tip"></span></span> have faced over 500 recorded attacks since 2012. Meanwhile, <span class="gloss">organized crime<span class="gloss-tip"></span></span> has been identified as the perpetrator in a growing share of those attacks, particularly since 2023.`,
+  },
+  es:{
+    kicker:"Reportaje de Investigación · Justicia Ambiental",
+    subtitle:"Desde la Amazonía hasta los bosques centroamericanos, las redes criminales atacan cada vez más a quienes se interponen entre la naturaleza y su destrucción — con consecuencias letales.",
+    bylineLabel:"Reportaje de",
+    ph1:"[ Marcador — Párrafo inicial ~200 palabras ]",
+    ph3:"[ Marcador — Pueblos Indígenas ~150 palabras ]",
+    ph4:"[ Marcador — Perfil de país ~200 palabras ]",
+    ph5:"[ Marcador — Patrones regionales ~150 palabras ]",
+    ph6:"[ Marcador — Contexto global ~150 palabras ]",
+    ph7:"[ Marcador — Factores estructurales ~150 palabras ]",
+    ph8:"[ Marcador — Políticas públicas ~150 palabras ]",
+    ph9:"[ Marcador — Párrafo final ~150 palabras ]",
+    viz1title:"Perfil por país: ataques, perpetradores y criminalidad",
+    viz1sub:"Selecciona un país para explorar el perfil de ataques contra defensores ambientales. ÍCO: GI-TOC 2025, con comparación 2023.",
+    viz2title:"Una crisis global, concentrada en América Latina",
+    viz2sub:"Total de ataques registrados contra defensores ambientales por país, 2012–2024.",
+    viz3title:"Violencia en aumento: composición de ataques a lo largo del tiempo",
+    viz3sub:"Ataques anuales contra defensores ambientales, 2012–2024. Altura = total. Colores = composición.",
+    selectLabel:"Seleccionar país —",
+    cardTotal:"Ataques totales",card2012:"Desde 2012",cardOC:"Participación del crimen organizado",
+    cardPct:"% del total",cardInd:"Proporción Pueblos Indígenas",cardOCInd:"CO atacando indígenas",
+    card2024:"Ataques en 2024",cardLatest:"Último año completo",
+    cardPerp:"Principales perpetradores",cardOCI:"Índice de Crimen Organizado 2025",
+    btnWorld:"Vista global",btnLatam:"Foco: América Latina",legendLabel:"Ataques (total) →",
+    modeStacked:"Vista apilada",modeOC:"% CO",modeInd:"% indígenas",modeOCI:"CO sobre indígenas",
+    methodBtn:"Metodología y Fuentes",
+    methodText1:"[ Marcador — Fuentes de datos ]",methodText2:"[ Marcador — Metodología y limitaciones ]",
+    footerText:"Datos: Front Line Defenders / Global Witness · ÍCO 2023 y 2025 (GI-TOC) · Caroline Chaffiotte, Fernanda Gandara Marchant y Annika Mösl",
+    ttTotal:"Ataques totales",ttYear:"En 2024",
+    criminality:"Criminalidad",resilience:"Resiliencia",since2023:"vs. 2023",
+    stackNeither:"Otro / Desconocido",stackOC:"Solo crimen organizado",stackInd:"Víctimas indígenas",stackBoth:"CO + Indígenas",
+    glossED:"Persona que, individual o colectivamente, actúa para promover o proteger los derechos humanos relacionados con el medio ambiente — tierra, agua, bosques y clima.",
+    glossOC:"Redes criminales y grupos tipo mafia que usan la violencia, la corrupción y la intimidación para controlar economías ilegales — minería ilegal, tala, narcotráfico y acaparamiento de tierras.",
+    titleHtml:`Cómo el <span class="gloss">Crimen Organizado<span class="gloss-tip"></span></span> <em>Amenaza</em> a los <span class="gloss">Defensores Ambientales<span class="gloss-tip"></span></span> en América Latina`,
+    introP2:`Solo en Colombia, los <span class="gloss">defensores ambientales<span class="gloss-tip"></span></span> han sufrido más de 500 ataques registrados desde 2012. El <span class="gloss">crimen organizado<span class="gloss-tip"></span></span> ha sido identificado como perpetrador en una proporción creciente de esos ataques, especialmente desde 2023.`,
+  }
+};
+
+let currentLang='en';
+function t(k){return I18N[currentLang][k]||k;}
+
+function applyGlossTips(el){
+  // Assign correct glossary text to all .gloss-tip elements within el
+  el.querySelectorAll('.gloss').forEach(g=>{
+    const tip=g.querySelector('.gloss-tip');
+    if(!tip)return;
+    const txt=g.textContent.trim().toLowerCase();
+    if(txt.includes('organized crime')||txt.includes('crimen organizado')||txt.includes('organised crime')){
+      tip.textContent=t('glossOC');
+    }else{
+      tip.textContent=t('glossED');
+    }
+  });
+}
+
+function setLang(lang){
+  currentLang=lang;
+  document.querySelectorAll('#lang-switch button').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`#lang-switch button[onclick="setLang('${lang}')"]`).classList.add('active');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent=t(el.getAttribute('data-i18n'));
+  });
+  // HTML elements
+  document.getElementById('main-title').innerHTML=t('titleHtml');
+  applyGlossTips(document.getElementById('main-title'));
+  const ip2=document.querySelector('[data-i18n-html="introP2"]');
+  if(ip2){ip2.innerHTML=t('introP2');applyGlossTips(ip2);}
+  updateDashboard(document.getElementById('dashboard-country').value);
+  updateChart(currentChartCountry);
+  updateChartLegend();
+}
+</script>
+
+<script>
+function updateDashboard(country){
+  const s=COUNTRY_STATS[country];if(!s)return;
+  document.getElementById('d-total').textContent=s.total.toLocaleString();
+  document.getElementById('d-oc').textContent=s.oc_share+'%';
+  document.getElementById('d-ind').textContent=s.indigenous_share+'%';
+  document.getElementById('d-oc-ind').textContent=s.oc_indigenous_share+'%';
+  document.getElementById('d-2024').textContent=s.attacks_2024;
+
+  const pb=document.getElementById('perp-bars');pb.innerHTML='';
+  (PERP_DATA[country]||[]).forEach(p=>{
+    pb.innerHTML+=`<div class="perp-row">
+      <div class="perp-name">${p.label}</div>
+      <div class="perp-track"><div class="perp-fill" style="width:${p.pct}%;background:${p.color}"></div></div>
+      <div class="perp-pct">${p.pct}%</div></div>`;
+  });
+
+  const oc=OCI_DATA[country]||{};
+  function arrow(v25,v23){
+    if(v25==null||v23==null)return'';
+    const d=v25-v23,a=Math.abs(d).toFixed(2);
+    if(Math.abs(d)<0.05)return`<span class="oci-change flat">→ ${t('since2023')}</span>`;
+    if(d>0)return`<span class="oci-change up">↑ +${a} ${t('since2023')}</span>`;
+    return`<span class="oci-change dn">↓ −${a} ${t('since2023')}</span>`;
+  }
+  document.getElementById('oci-card').innerHTML=`
+    <div class="oci-row">
+      <div class="oci-header">
+        <span class="oci-label">${t('criminality')}</span>
+        <div class="oci-values"><span class="oci-score" style="color:#e74c3c">${oc.c25!=null?oc.c25.toFixed(2):'—'}/10</span>${arrow(oc.c25,oc.c23)}</div>
+      </div>
+      <div class="oci-track"><div class="oci-fill crim" style="width:${oc.c25?oc.c25*10:0}%"></div></div>
+      <div class="oci-prev">2023: ${oc.c23!=null?oc.c23.toFixed(2):'—'}</div>
+    </div>
+    <div class="oci-row">
+      <div class="oci-header">
+        <span class="oci-label">${t('resilience')}</span>
+        <div class="oci-values"><span class="oci-score" style="color:#1abc9c">${oc.r25!=null?oc.r25.toFixed(2):'—'}/10</span>${arrow(oc.r25,oc.r23)}</div>
+      </div>
+      <div class="oci-track"><div class="oci-fill res" style="width:${oc.r25?oc.r25*10:0}%"></div></div>
+      <div class="oci-prev">2023: ${oc.r23!=null?oc.r23.toFixed(2):'—'}</div>
+    </div>`;
+}
+</script>
+
+<script>
+const wdMap={};WORLD_DATA.forEach(d=>{wdMap[d.country]=d;});
+const NAME_ALT={'United States of America':['United States','USA'],
+  'Democratic Republic of the Congo':['Dem. Rep. Congo','Congo, Dem. Rep.'],
+  'Türkiye':['Turkey','Turkiye']};
+function matchName(n){for(const[k,v]of Object.entries(NAME_ALT)){if(v.includes(n)||n===k)return k;}return n;}
+function attackColor(d){
+  if(!d||d.total===0)return'#2a2a2a';
+  if(d.total<=10)return'#5a2020';if(d.total<=30)return'#863020';
+  if(d.total<=80)return'#b03828';if(d.total<=200)return'#c9392b';return'#ef4d3c';
+}
+let mapSvg,mapZoom,mapG,mapProj;
+
+async function initMap(){
+  const cont=document.getElementById('map-container');
+  const W=cont.offsetWidth,H=Math.round(W*0.52);
+  mapProj=d3.geoNaturalEarth1().scale(W/6.3).translate([W/2,H/2]);
+  const path=d3.geoPath().projection(mapProj);
+  mapSvg=d3.select('#world-map').attr('viewBox',`0 0 ${W} ${H}`).attr('width',W).attr('height',H);
+  mapZoom=d3.zoom().scaleExtent([0.5,12]).on('zoom',e=>mapG.attr('transform',e.transform));
+  mapSvg.call(mapZoom);
+  mapG=mapSvg.append('g');
+  mapG.append('rect').attr('width',W).attr('height',H).attr('fill','#181818');
+  try{
+    const world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    const feats=topojson.feature(world,world.objects.countries).features;
+    mapG.selectAll('.country-path').data(feats).enter().append('path')
+      .attr('class','country-path').attr('d',path)
+      .attr('fill',d=>attackColor(wdMap[matchName((d.properties&&d.properties.name)||'')]))
+      .on('mouseover',function(ev,d){
+        const nm=(d.properties&&d.properties.name)||'Unknown';
+        const data=wdMap[matchName(nm)];
+        const tt=document.getElementById('map-tt');tt.style.display='block';
+        tt.innerHTML=`<strong>${nm}</strong>
+          <div class="tr"><span>${t('ttTotal')}:</span><span class="tv">${data?data.total:0}</span></div>
+          <div class="tr"><span>${t('ttYear')}:</span><span class="tv">${data?data.attacks_2024:0}</span></div>`;
+        posMapTT(ev,tt);
+      })
+      .on('mousemove',ev=>posMapTT(ev,document.getElementById('map-tt')))
+      .on('mouseout',()=>{document.getElementById('map-tt').style.display='none';});
+  }catch(e){
+    const sz=d3.scaleSqrt().domain([0,509]).range([3,28]);
+    mapG.selectAll('circle').data(WORLD_DATA).enter().append('circle')
+      .attr('cx',d=>mapProj([d.lon,d.lat])[0]).attr('cy',d=>mapProj([d.lon,d.lat])[1])
+      .attr('r',d=>sz(d.total)).attr('fill',d=>attackColor(d)).attr('fill-opacity',.85)
+      .attr('stroke','rgba(255,255,255,.12)').attr('stroke-width',.5)
+      .on('mouseover',function(ev,d){
+        const tt=document.getElementById('map-tt');tt.style.display='block';
+        tt.innerHTML=`<strong>${d.country}</strong>
+          <div class="tr"><span>${t('ttTotal')}:</span><span class="tv">${d.total}</span></div>
+          <div class="tr"><span>${t('ttYear')}:</span><span class="tv">${d.attacks_2024}</span></div>`;
+        posMapTT(ev,tt);})
+      .on('mousemove',ev=>posMapTT(ev,document.getElementById('map-tt')))
+      .on('mouseout',()=>{document.getElementById('map-tt').style.display='none';});
+  }
+}
+function posMapTT(ev,tt){
+  const r=document.getElementById('map-container').getBoundingClientRect();
+  let x=ev.clientX-r.left+12,y=ev.clientY-r.top-12;
+  if(x+200>r.width)x-=212;if(y<0)y=0;
+  tt.style.left=x+'px';tt.style.top=y+'px';
+}
+function zoomMap(view){
+  document.getElementById('btn-world').classList.toggle('active',view==='world');
+  document.getElementById('btn-latam').classList.toggle('active',view==='latam');
+  if(!mapSvg||!mapProj)return;
+  if(view==='latam'){
+    const cont=document.getElementById('map-container');
+    const W=cont.offsetWidth,H=Math.round(W*0.52);
+    // Latin America bounding box lon -120..−34, lat −56..33
+    const p1=mapProj([-120,33]),p2=mapProj([-34,-56]);
+    if(!p1||!p2)return;
+    const bx=Math.min(p1[0],p2[0]),by=Math.min(p1[1],p2[1]);
+    const bw=Math.abs(p2[0]-p1[0]),bh=Math.abs(p2[1]-p1[1]);
+    const scale=Math.min(W/bw,H/bh)*0.82;
+    const tx=W/2-(bx+bw/2)*scale,ty=H/2-(by+bh/2)*scale;
+    mapSvg.transition().duration(750).call(mapZoom.transform,d3.zoomIdentity.translate(tx,ty).scale(scale));
+  }else{
+    mapSvg.transition().duration(750).call(mapZoom.transform,d3.zoomIdentity);
+  }
+}
+</script>
+
+<script>
+let currentChartMode='stacked',currentChartCountry='Colombia';
+const SC={neither:'#3a3a3a',oc_only:'#e74c3c',ind_only:'#1abc9c',both:'#f39c12'};
+
+function setChartMode(m){
+  currentChartMode=m;
+  ['stacked','oc','ind','oci'].forEach(x=>document.getElementById('mode-'+x).classList.toggle('active',x===m));
+  updateChartLegend();updateChart(currentChartCountry);
+}
+function updateChartLegend(){
+  const el=document.getElementById('chart-legend');
+  if(currentChartMode==='stacked'){
+    el.innerHTML=`<div class="cl-item"><div class="cl-dot" style="background:${SC.neither}"></div>${t('stackNeither')}</div>
+      <div class="cl-item"><div class="cl-dot" style="background:${SC.oc_only}"></div>${t('stackOC')}</div>
+      <div class="cl-item"><div class="cl-dot" style="background:${SC.ind_only}"></div>${t('stackInd')}</div>
+      <div class="cl-item"><div class="cl-dot" style="background:${SC.both}"></div>${t('stackBoth')}</div>`;
+  }else{
+    const c={oc:'#e74c3c',ind:'#1abc9c',oci:'#f39c12'}[currentChartMode];
+    const lbl={oc:t('modeOC'),ind:t('modeInd'),oci:t('modeOCI')}[currentChartMode];
+    el.innerHTML=`<div class="cl-item"><div class="cl-dot" style="background:#3a3a3a"></div>${t('stackNeither')}</div>
+      <div class="cl-item"><div class="cl-dot" style="background:${c}"></div>${lbl}</div>`;
+  }
+}
+function updateChart(country){
+  currentChartCountry=country;
+  document.getElementById('chart-country').value=country;
+  const data=TIMELINE[country];if(!data)return;
+  const svg=d3.select('#bar-chart');svg.selectAll('*').remove();
+  const W=svg.node().parentElement.offsetWidth||700,H=340;
+  const m={top:16,right:20,bottom:38,left:42};
+  const w=W-m.left-m.right,h=H-m.top-m.bottom;
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${m.left},${m.top})`);
+  const xSc=d3.scaleBand().domain(data.map(d=>d.y)).range([0,w]).padding(.22);
+  const maxT=Math.max(...data.map(d=>d.t),1);
+  const ySc=d3.scaleLinear().domain([0,maxT]).range([h,0]).nice();
+  g.selectAll('.gl').data(ySc.ticks(5)).enter().append('line')
+    .attr('x1',0).attr('x2',w).attr('y1',d=>ySc(d)).attr('y2',d=>ySc(d)).attr('stroke','rgba(255,255,255,.04)');
+  g.append('g').attr('transform',`translate(0,${h})`).call(d3.axisBottom(xSc))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();
+      ax.selectAll('text').attr('fill','#6a6050').attr('font-size','9.5px').attr('font-family','IBM Plex Mono,monospace').attr('dy','1.2em')});
+  g.append('g').call(d3.axisLeft(ySc).ticks(5))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();
+      ax.selectAll('text').attr('fill','#6a6050').attr('font-size','9.5px').attr('font-family','IBM Plex Mono,monospace')});
+
+  let tip=document.getElementById('chart-tip');
+  if(!tip){tip=document.createElement('div');tip.id='chart-tip';
+    tip.style.cssText='position:fixed;background:rgba(10,10,10,.97);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:10px 14px;font-size:.77rem;pointer-events:none;display:none;z-index:999;color:#a09880;line-height:1.7;min-width:160px';
+    document.body.appendChild(tip);}
+
+  if(currentChartMode==='stacked'){
+    const segs=[{key:'neither',color:SC.neither,lbl:'stackNeither'},
+      {key:'oc_only',color:SC.oc_only,lbl:'stackOC'},
+      {key:'ind_only',color:SC.ind_only,lbl:'stackInd'},
+      {key:'both',color:SC.both,lbl:'stackBoth'}];
+    data.forEach(d=>{
+      if(d.t===0)return;
+      let y0=h;
+      segs.forEach(seg=>{
+        const n=d[seg.key]||0;if(n===0)return;
+        const bh2=h-ySc(n),by2=y0-bh2;
+        g.append('rect').attr('x',xSc(d.y)).attr('width',xSc.bandwidth())
+          .attr('y',by2).attr('height',bh2).attr('fill',seg.color).attr('rx',1)
+          .on('mouseover',function(ev){d3.select(this).attr('opacity',.7);tip.style.display='block';
+            tip.innerHTML=`<strong style="color:#fff;font-family:'Playfair Display',serif">${d.y} · ${country}</strong><br>
+              <span style="color:${SC.neither}">■</span> ${t('stackNeither')}: <b style="color:#fff">${d.neither}</b><br>
+              <span style="color:${SC.oc_only}">■</span> ${t('stackOC')}: <b style="color:#fff">${d.oc_only}</b><br>
+              <span style="color:${SC.ind_only}">■</span> ${t('stackInd')}: <b style="color:#fff">${d.ind_only}</b><br>
+              <span style="color:${SC.both}">■</span> ${t('stackBoth')}: <b style="color:#fff">${d.both}</b><br>
+              <span style="opacity:.5;font-size:.7rem">Total: ${d.t}</span>`;})
+          .on('mousemove',ev=>{tip.style.left=(ev.clientX+12)+'px';tip.style.top=(ev.clientY-100)+'px';})
+          .on('mouseout',function(){d3.select(this).attr('opacity',1);tip.style.display='none';});
+        y0=by2;
+      });
+    });
+  }else{
+    const kMap={oc:'oc_n',ind:'ind_n',oci:'oci_n'};
+    const cMap={oc:'#e74c3c',ind:'#1abc9c',oci:'#f39c12'};
+    const pMap={oc:'oc_pct',ind:'ind_pct',oci:'oci_pct'};
+    const sk=kMap[currentChartMode],col=cMap[currentChartMode],pk=pMap[currentChartMode];
+    data.forEach(d=>{
+      if(d.t===0)return;
+      g.append('rect').attr('x',xSc(d.y)).attr('width',xSc.bandwidth())
+        .attr('y',ySc(d.t)).attr('height',h-ySc(d.t)).attr('fill','#2a2a2a').attr('rx',1);
+      const n=d[sk]||0;
+      if(n>0){
+        g.append('rect').attr('x',xSc(d.y)).attr('width',xSc.bandwidth())
+          .attr('y',ySc(n)).attr('height',h-ySc(n)).attr('fill',col).attr('rx',1)
+          .on('mouseover',function(ev){d3.select(this).attr('opacity',.7);tip.style.display='block';
+            tip.innerHTML=`<strong style="color:#fff;font-family:'Playfair Display',serif">${d.y} · ${country}</strong><br>
+              Total: <b style="color:#fff">${d.t}</b><br>
+              Share: <b style="color:${col}">${n} (${d[pk]}%)</b>`;})
+          .on('mousemove',ev=>{tip.style.left=(ev.clientX+12)+'px';tip.style.top=(ev.clientY-60)+'px';})
+          .on('mouseout',function(){d3.select(this).attr('opacity',1);tip.style.display='none';});
+      }
+    });
+  }
+}
+</script>
+
+<script>
+function toggleMethodology(){
+  document.getElementById('method-btn').classList.toggle('open');
+  document.getElementById('method-body').classList.toggle('open');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  setLang('en');
+  updateDashboard('Colombia');
+  initMap();
+  updateChartLegend();
+  updateChart('Colombia');
+  window.addEventListener('resize',()=>updateChart(currentChartCountry));
+});
+</script>
+</body>
+</html>
