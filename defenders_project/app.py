@@ -245,7 +245,7 @@ sub_en   = "Standing between nature and destruction comes at a price - and Latin
 sub_es   = "Defender la naturaleza tiene un precio mortal, especialmente en Latinoamérica."
 
 
-header_src ="https://raw.githubusercontent.com/annikam9/defenders-project/blob/main/my-folder/header.jpeg"
+header_src ="https://raw.githubusercontent.com/annikam9/defenders-project/main/defenders_project/header.jpeg"
 
 st.markdown(f"""
 <div style="position:relative;overflow:hidden;min-height:280px;padding:32px 24px 32px">
@@ -288,15 +288,13 @@ else:
 # ─────────────────────────────────────────────────────────────
 # VIZ 1: DASHBOARD
 # ─────────────────────────────────────────────────────────────
-st.markdown(f"""
-<div class="viz-wrap">
-<div class="viz-title">{tx('dash_title')}</div>
-<div class="viz-sub">{tx('dash_sub')}</div>
-</div>
-""", unsafe_allow_html=True)
 
 with st.container():
-    st.markdown('<div class="viz-wrap">', unsafe_allow_html=True)
+    st.markdown(f"""<div class="viz-wrap">
+<div class="viz-title">{tx('dash_title')}</div>
+<div class="viz-sub">{tx('dash_sub')}</div>
+""", unsafe_allow_html=True)
+
     dash_cty = st.selectbox(tx("select_cty"), LATAM, index=LATAM.index("Colombia"), key="dash_cty")
     s   = STATS[dash_cty]
     oc  = OCI[dash_cty]
