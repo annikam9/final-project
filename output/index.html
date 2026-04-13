@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Organized Crime Threatens Environmental Defenders in Latin America</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  :root {
+    --bg:#0d0d0d; --bg2:#141414; --bg3:#1a1a1a; --bg4:#222;
+    --text:#e8e0d0; --text2:#a09880; --text3:#6a6050;
+    --red:#c0392b; --red2:#e74c3c; --amber:#e67e22; --amber2:#f39c12;
+    --teal:#1abc9c; --border:rgba(255,255,255,0.07);
+    --serif:'Playfair Display',Georgia,serif;
+    --body:'Source Serif 4',Georgia,serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.8}
+
+  /* LANG SWITCH */
+  #lang-switch{position:fixed;top:20px;right:24px;z-index:999;display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:rgba(13,13,13,.92);backdrop-filter:blur(8px)}
+  #lang-switch button{background:transparent;border:none;color:var(--text3);font-family:var(--mono);font-size:11px;letter-spacing:.12em;padding:7px 14px;cursor:pointer;transition:all .2s}
+  #lang-switch button.active{background:var(--red);color:#fff}
+  #lang-switch button:hover:not(.active){color:var(--text)}
+
+  /* HEADER */
+  header{max-width:860px;margin:0 auto;padding:120px 24px 60px}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:28px}
+  h1{font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;line-height:1.1;color:#fff;margin-bottom:28px;letter-spacing:-.01em}
+  h1 em{color:var(--red2);font-style:italic}
+  .subtitle{font-family:var(--body);font-size:1.25rem;font-weight:300;color:var(--text2);line-height:1.6;margin-bottom:40px;max-width:680px}
+  .byline{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--text3);padding-top:28px;border-top:1px solid var(--border)}
+  .byline strong{color:var(--text2)}
+  .rule{width:100%;height:1px;background:var(--border)}
+
+  /* ARTICLE */
+  .article-body{max-width:680px;margin:0 auto;padding:60px 24px}
+  .article-body p{margin-bottom:28px;color:var(--text);font-weight:300}
+  .placeholder-text{color:var(--text3);border-left:2px solid var(--bg4);padding-left:20px;font-style:italic;font-size:.9rem;margin-bottom:28px}
+
+  /* VIZ */
+  .section-label{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.25em;color:var(--text3);text-transform:uppercase;margin-bottom:40px}
+  .viz-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:60px 0}
+  .viz-inner{max-width:1100px;margin:0 auto;padding:0 24px}
+  .viz-title{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:8px}
+  .viz-subtitle{font-size:.85rem;color:var(--text2);margin-bottom:32px;font-weight:300}
+
+  /* COUNTRY SELECTOR */
+  .country-selector{display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .country-selector label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--text3)}
+  .country-selector select{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:.95rem;padding:8px 32px 8px 14px;border-radius:4px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23a09880' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--bg3)}
+
+  /* DASHBOARD */
+  .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:16px}
+  .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:20px;transition:border-color .2s}
+  .stat-card:hover{border-color:rgba(255,255,255,.15)}
+  .stat-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+  .stat-value{font-family:var(--serif);font-size:2rem;font-weight:700;color:#fff;line-height:1;margin-bottom:4px}
+  .stat-value.red{color:var(--red2)} .stat-value.amber{color:var(--amber2)} .stat-value.teal{color:var(--teal)}
+  .stat-note{font-size:.75rem;color:var(--text3)}
+  .lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0}
+  .donut-row{display:flex;gap:24px;flex-wrap:wrap;margin-top:8px}
+  .donut-item{text-align:center}
+  .donut-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-top:6px}
+  .score-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  .score-bar-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+  .score-bar-label span{color:var(--text2)}
+  .score-bar-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+  .score-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .score-bar-fill.criminality{background:var(--red2)} .score-bar-fill.resilience{background:var(--teal)}
+
+  /* MAP */
+  #map-container{position:relative;background:var(--bg3);border-radius:6px;overflow:hidden}
+  .map-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .map-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:6px 14px;border-radius:3px;cursor:pointer;transition:all .2s}
+  .map-btn:hover,.map-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+  .map-legend{display:flex;gap:16px;align-items:center;margin-top:16px;flex-wrap:wrap}
+  .legend-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text3)}
+  .legend-scale{display:flex;gap:3px;align-items:center}
+  .legend-swatch{width:24px;height:10px;border-radius:2px}
+  .map-tooltip{position:absolute;background:rgba(13,13,13,.96);border:1px solid var(--border);border-radius:4px;padding:12px 16px;font-size:.8rem;pointer-events:none;z-index:100;max-width:200px;backdrop-filter:blur(4px)}
+  .map-tooltip strong{display:block;font-family:var(--serif);font-size:1rem;color:#fff;margin-bottom:6px}
+  .map-tooltip .tt-row{display:flex;justify-content:space-between;gap:16px;color:var(--text2);font-size:.75rem;margin-bottom:2px}
+  .map-tooltip .tt-val{color:var(--red2);font-weight:600}
+  .country-path{stroke:#1a1a1a;stroke-width:.5;cursor:pointer;transition:opacity .15s}
+  .country-path:hover{opacity:.75;stroke:rgba(255,255,255,.3);stroke-width:1}
+
+  /* CHART */
+  .chart-controls{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+  .chart-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:6px 14px;border-radius:3px;cursor:pointer;transition:all .2s}
+  .chart-btn:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+  .chart-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+
+  /* METHODOLOGY */
+  .methodology{max-width:860px;margin:0 auto;padding:0 24px 80px}
+  .method-toggle{width:100%;background:transparent;border:1px solid var(--border);border-radius:4px;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:var(--text2);font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-align:left;transition:all .2s}
+  .method-toggle:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+  .method-toggle .arrow{font-size:16px;transition:transform .3s;color:var(--text3)}
+  .method-toggle.open .arrow{transform:rotate(180deg)}
+  .method-body{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:32px}
+  .method-body.open{display:block}
+  .method-body p{color:var(--text2);font-size:.9rem;margin-bottom:20px;font-weight:300}
+
+  footer{border-top:1px solid var(--border);padding:32px 24px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text3)}
+
+  @media(max-width:640px){
+    h1{font-size:2rem}
+    .dashboard-grid{grid-template-columns:1fr 1fr}
+    .lower-grid{grid-template-columns:1fr}
+    .score-bars{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE SWITCH -->
+<div id="lang-switch">
+  <button class="active" onclick="setLang('en')">EN</button>
+  <button onclick="setLang('es')">ES</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="kicker" data-i18n="kicker">Investigative Report · Environmental Justice</div>
+  <h1 data-i18n="title">How Organized Crime <em>Threatens</em> Environmental Defenders in Latin America</h1>
+  <p class="subtitle" data-i18n="subtitle">From the Amazon to Central American forests, criminal networks are increasingly targeting the people who stand between nature and destruction — with lethal consequences.</p>
+  <div class="byline">
+    <span data-i18n="bylineLabel">Story by</span>
+    <strong>Caroline Chaffiotte, Fernanda Gandara Marchant and Annika Mösl</strong>
+  </div>
+</header>
+
+<div class="rule"></div>
+
+<!-- INTRO TEXT -->
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="placeholder1">[ Placeholder — Opening paragraph ]</p>
+  <p class="placeholder-text" data-i18n="placeholder2">[ Placeholder — Scale of the problem ]</p>
+  <p class="placeholder-text" data-i18n="placeholder3">[ Placeholder — OC and environmental defenders link ]</p>
+  <p class="placeholder-text" data-i18n="placeholder4">[ Placeholder — Indigenous Peoples impact ]</p>
+</div>
+
+<!-- VIZ 1: COUNTRY DASHBOARD -->
+<div class="viz-section">
+  <div class="viz-inner">
+    <div class="section-label" data-i18n="viz1label">Visualisation 1 of 3</div>
+    <div class="viz-title" data-i18n="viz1title">Country snapshot: attacks, perpetrators and criminality</div>
+    <p class="viz-subtitle" data-i18n="viz1sub">Select a country to explore the full profile of attacks against environmental defenders. Data: Front Line Defenders / Global Witness, OCI 2023.</p>
+
+    <div class="country-selector">
+      <label data-i18n="selectLabel">Select country —</label>
+      <select id="dashboard-country" onchange="updateDashboard(this.value)">
+        <option value="Argentina">Argentina</option>
+        <option value="Bolivia">Bolivia</option>
+        <option value="Brazil">Brazil</option>
+        <option value="Chile">Chile</option>
+        <option value="Colombia" selected>Colombia</option>
+        <option value="Costa Rica">Costa Rica</option>
+        <option value="Dominican Republic">Dominican Republic</option>
+        <option value="Ecuador">Ecuador</option>
+        <option value="Guatemala">Guatemala</option>
+        <option value="Honduras">Honduras</option>
+        <option value="Mexico">Mexico</option>
+        <option value="Nicaragua">Nicaragua</option>
+        <option value="Panama">Panama</option>
+        <option value="Paraguay">Paraguay</option>
+        <option value="Peru">Peru</option>
+        <option value="Venezuela">Venezuela</option>
+      </select>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="cardTotal">Total attacks recorded</div>
+        <div class="stat-value red" id="d-total">—</div>
+        <div class="stat-note" data-i18n="card2012">Since 2012</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="cardOC">Organised crime share</div>
+        <div class="stat-value amber" id="d-oc">—</div>
+        <div class="stat-note" data-i18n="cardPct">% of all attacks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="cardIndigenous">Indigenous Peoples share</div>
+        <div class="stat-value teal" id="d-indigenous">—</div>
+        <div class="stat-note" data-i18n="cardPct">% of all victims</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="cardOCInd">OC targeting Indigenous</div>
+        <div class="stat-value" id="d-oc-ind">—</div>
+        <div class="stat-note" data-i18n="cardPct">% of all attacks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="card2024">Attacks in 2024</div>
+        <div class="stat-value red" id="d-2024">—</div>
+        <div class="stat-note" data-i18n="cardLatest">Latest full year</div>
+      </div>
+    </div>
+
+    <div class="lower-grid">
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="cardActType">Attack type breakdown</div>
+        <div class="donut-row" id="donut-container"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="cardOCI">Organized Crime Index 2023</div>
+        <div class="score-bars" id="score-bars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MID TEXT -->
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="placeholder5">[ Placeholder — Country deep-dive ]</p>
+  <p class="placeholder-text" data-i18n="placeholder6">[ Placeholder — Regional patterns ]</p>
+</div>
+
+<!-- VIZ 2: WORLD MAP -->
+<div class="viz-section">
+  <div class="viz-inner">
+    <div class="section-label" data-i18n="viz2label">Visualisation 2 of 3</div>
+    <div class="viz-title" data-i18n="viz2title">A global crisis, concentrated in Latin America</div>
+    <p class="viz-subtitle" data-i18n="viz2sub">Total recorded attacks against environmental defenders by country, 2012–2024. Hover for details.</p>
+
+    <div class="map-controls">
+      <button class="map-btn active" id="btn-world" onclick="zoomMap('world')" data-i18n="btnWorld">World view</button>
+      <button class="map-btn" id="btn-latam" onclick="zoomMap('latam')" data-i18n="btnLatam">Focus: Latin America</button>
+    </div>
+
+    <div id="map-container">
+      <svg id="world-map" style="display:block;width:100%;height:auto"></svg>
+      <div id="map-tooltip" class="map-tooltip" style="display:none"></div>
+    </div>
+
+    <div class="map-legend">
+      <span class="legend-label" data-i18n="legendAttacks">Attacks →</span>
+      <div class="legend-scale">
+        <div class="legend-swatch" style="background:#1a1a1a;border:1px solid #333"></div>
+        <div class="legend-swatch" style="background:#4a1a1a"></div>
+        <div class="legend-swatch" style="background:#7a2020"></div>
+        <div class="legend-swatch" style="background:#a83020"></div>
+        <div class="legend-swatch" style="background:#c0392b"></div>
+        <div class="legend-swatch" style="background:#e74c3c"></div>
+      </div>
+      <span class="legend-label">0 &nbsp;1–10 &nbsp;11–30 &nbsp;31–80 &nbsp;81–200 &nbsp;200+</span>
+    </div>
+  </div>
+</div>
+
+<!-- MID TEXT -->
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="placeholder7">[ Placeholder — Global context ]</p>
+  <p class="placeholder-text" data-i18n="placeholder8">[ Placeholder — Structural factors ]</p>
+</div>
+
+<!-- VIZ 3: BAR CHART -->
+<div class="viz-section">
+  <div class="viz-inner">
+    <div class="section-label" data-i18n="viz3label">Visualisation 3 of 3</div>
+    <div class="viz-title" data-i18n="viz3title">Rising violence: attacks over time by country</div>
+    <p class="viz-subtitle" data-i18n="viz3sub">Annual attacks against environmental defenders, 2012–2024. Switch metrics with the buttons below.</p>
+
+    <div class="country-selector" style="margin-bottom:16px">
+      <label data-i18n="selectLabel">Select country —</label>
+      <select id="chart-country" onchange="updateChart(this.value)">
+        <option value="Argentina">Argentina</option>
+        <option value="Bolivia">Bolivia</option>
+        <option value="Brazil">Brazil</option>
+        <option value="Chile">Chile</option>
+        <option value="Colombia" selected>Colombia</option>
+        <option value="Costa Rica">Costa Rica</option>
+        <option value="Dominican Republic">Dominican Republic</option>
+        <option value="Ecuador">Ecuador</option>
+        <option value="Guatemala">Guatemala</option>
+        <option value="Honduras">Honduras</option>
+        <option value="Mexico">Mexico</option>
+        <option value="Nicaragua">Nicaragua</option>
+        <option value="Panama">Panama</option>
+        <option value="Paraguay">Paraguay</option>
+        <option value="Peru">Peru</option>
+        <option value="Venezuela">Venezuela</option>
+      </select>
+    </div>
+
+    <div class="chart-controls">
+      <button class="chart-btn active" id="metric-total" onclick="setMetric('total')" data-i18n="metricTotal">Total attacks</button>
+      <button class="chart-btn" id="metric-oc"    onclick="setMetric('oc')"    data-i18n="metricOC">Organised crime %</button>
+      <button class="chart-btn" id="metric-ind"   onclick="setMetric('ind')"   data-i18n="metricInd">Indigenous victims %</button>
+      <button class="chart-btn" id="metric-oci"   onclick="setMetric('oci')"   data-i18n="metricOCI">OC targeting Indigenous %</button>
+    </div>
+
+    <svg id="bar-chart" style="width:100%;height:340px"></svg>
+  </div>
+</div>
+
+<!-- CLOSING TEXT -->
+<div class="article-body">
+  <p class="placeholder-text" data-i18n="placeholder9">[ Placeholder — Policy responses ]</p>
+  <p class="placeholder-text" data-i18n="placeholder10">[ Placeholder — Closing paragraph ]</p>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="methodology">
+  <button class="method-toggle" id="method-btn" onclick="toggleMethodology()">
+    <span data-i18n="methodBtn">Methodology &amp; Data Sources</span>
+    <span class="arrow">▾</span>
+  </button>
+  <div class="method-body" id="method-body">
+    <p class="placeholder-text" data-i18n="methodText1">[ Placeholder — Data sources description ]</p>
+    <p class="placeholder-text" data-i18n="methodText2">[ Placeholder — Methodology and limitations ]</p>
+  </div>
+</div>
+
+<footer>
+  <span data-i18n="footerText">Data: Front Line Defenders / Global Witness · Organized Crime Index 2023 (GI-TOC) · Caroline Chaffiotte, Fernanda Gandara Marchant &amp; Annika Mösl</span>
+</footer>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- DATA injected by Python / Jinja2           -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+const COUNTRY_STATS = {"Argentina": {"total": 8, "oc_share": 0.0, "indigenous_share": 75.0, "oc_indigenous_share": 0.0, "murders": 8, "disappearances": 0, "criminality": 5.0, "resilience": 5.96, "attacks_2024": 1}, "Bolivia": {"total": 2, "oc_share": 0.0, "indigenous_share": 50.0, "oc_indigenous_share": 0.0, "murders": 2, "disappearances": 0, "criminality": 4.95, "resilience": 4.83, "attacks_2024": 0}, "Brazil": {"total": 413, "oc_share": 8.0, "indigenous_share": 24.9, "oc_indigenous_share": 3.6, "murders": 407, "disappearances": 6, "criminality": 6.77, "resilience": 4.92, "attacks_2024": 12}, "Chile": {"total": 5, "oc_share": 0.0, "indigenous_share": 80.0, "oc_indigenous_share": 0.0, "murders": 4, "disappearances": 1, "criminality": 5.18, "resilience": 6.17, "attacks_2024": 1}, "Colombia": {"total": 509, "oc_share": 14.5, "indigenous_share": 40.5, "oc_indigenous_share": 6.3, "murders": 498, "disappearances": 11, "criminality": 7.75, "resilience": 5.63, "attacks_2024": 48}, "Costa Rica": {"total": 4, "oc_share": 25.0, "indigenous_share": 50.0, "oc_indigenous_share": 25.0, "murders": 4, "disappearances": 0, "criminality": 5.53, "resilience": 5.63, "attacks_2024": 0}, "Dominican Republic": {"total": 4, "oc_share": 0.0, "indigenous_share": 0.0, "oc_indigenous_share": 0.0, "murders": 4, "disappearances": 0, "criminality": 5.02, "resilience": 4.79, "attacks_2024": 1}, "Ecuador": {"total": 9, "oc_share": 0.0, "indigenous_share": 44.4, "oc_indigenous_share": 0.0, "murders": 8, "disappearances": 1, "criminality": 7.07, "resilience": 4.88, "attacks_2024": 3}, "Guatemala": {"total": 106, "oc_share": 6.6, "indigenous_share": 47.2, "oc_indigenous_share": 0.9, "murders": 105, "disappearances": 1, "criminality": 6.6, "resilience": 4.08, "attacks_2024": 20}, "Honduras": {"total": 155, "oc_share": 1.3, "indigenous_share": 25.8, "oc_indigenous_share": 0.0, "murders": 149, "disappearances": 6, "criminality": 7.05, "resilience": 4.08, "attacks_2024": 6}, "Mexico": {"total": 222, "oc_share": 14.0, "indigenous_share": 49.5, "oc_indigenous_share": 5.0, "murders": 183, "disappearances": 39, "criminality": 7.57, "resilience": 4.21, "attacks_2024": 19}, "Nicaragua": {"total": 74, "oc_share": 17.6, "indigenous_share": 98.6, "oc_indigenous_share": 17.6, "murders": 71, "disappearances": 3, "criminality": 5.72, "resilience": 2.08, "attacks_2024": 4}, "Panama": {"total": 5, "oc_share": 0.0, "indigenous_share": 40.0, "oc_indigenous_share": 0.0, "murders": 5, "disappearances": 0, "criminality": 6.98, "resilience": 4.67, "attacks_2024": 0}, "Paraguay": {"total": 18, "oc_share": 11.1, "indigenous_share": 5.6, "oc_indigenous_share": 0.0, "murders": 18, "disappearances": 0, "criminality": 7.52, "resilience": 3.42, "attacks_2024": 0}, "Peru": {"total": 62, "oc_share": 17.7, "indigenous_share": 54.8, "oc_indigenous_share": 14.5, "murders": 58, "disappearances": 4, "criminality": 6.4, "resilience": 4.38, "attacks_2024": 4}, "Venezuela": {"total": 23, "oc_share": 52.2, "indigenous_share": 78.3, "oc_indigenous_share": 47.8, "murders": 23, "disappearances": 0, "criminality": 6.72, "resilience": 1.88, "attacks_2024": 1}};
+const TIMELINE      = {"Argentina": [{"y": 2012, "t": 3, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2013, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 2, "oc": 0.0, "ind": 50.0, "oci": 0.0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2020, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2021, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2022, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2023, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2024, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}], "Bolivia": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2022, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2023, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2024, "t": 0, "oc": 0, "ind": 0, "oci": 0}], "Brazil": [{"y": 2012, "t": 36, "oc": 0.0, "ind": 22.2, "oci": 0.0}, {"y": 2013, "t": 32, "oc": 0.0, "ind": 46.9, "oci": 0.0}, {"y": 2014, "t": 29, "oc": 0.0, "ind": 13.8, "oci": 0.0}, {"y": 2015, "t": 48, "oc": 0.0, "ind": 12.5, "oci": 0.0}, {"y": 2016, "t": 49, "oc": 2.0, "ind": 30.6, "oci": 0.0}, {"y": 2017, "t": 58, "oc": 29.3, "ind": 6.9, "oci": 3.4}, {"y": 2018, "t": 20, "oc": 5.0, "ind": 5.0, "oci": 5.0}, {"y": 2019, "t": 24, "oc": 20.8, "ind": 41.7, "oci": 20.8}, {"y": 2020, "t": 20, "oc": 40.0, "ind": 50.0, "oci": 35.0}, {"y": 2021, "t": 26, "oc": 0.0, "ind": 15.4, "oci": 0.0}, {"y": 2022, "t": 34, "oc": 0.0, "ind": 29.4, "oci": 0.0}, {"y": 2023, "t": 25, "oc": 4.0, "ind": 48.0, "oci": 0.0}, {"y": 2024, "t": 12, "oc": 0.0, "ind": 33.3, "oci": 0.0}], "Chile": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2017, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2018, "t": 2, "oc": 0.0, "ind": 50.0, "oci": 0.0}, {"y": 2019, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2022, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2023, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2024, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}], "Colombia": [{"y": 2012, "t": 9, "oc": 0.0, "ind": 55.6, "oci": 0.0}, {"y": 2013, "t": 15, "oc": 6.7, "ind": 26.7, "oci": 0.0}, {"y": 2014, "t": 25, "oc": 0.0, "ind": 52.0, "oci": 0.0}, {"y": 2015, "t": 26, "oc": 0.0, "ind": 30.8, "oci": 0.0}, {"y": 2016, "t": 36, "oc": 2.8, "ind": 41.7, "oci": 2.8}, {"y": 2017, "t": 24, "oc": 4.2, "ind": 50.0, "oci": 4.2}, {"y": 2018, "t": 25, "oc": 12.0, "ind": 36.0, "oci": 4.0}, {"y": 2019, "t": 64, "oc": 6.2, "ind": 50.0, "oci": 1.6}, {"y": 2020, "t": 65, "oc": 0.0, "ind": 32.3, "oci": 0.0}, {"y": 2021, "t": 33, "oc": 3.0, "ind": 48.5, "oci": 0.0}, {"y": 2022, "t": 60, "oc": 0.0, "ind": 38.3, "oci": 0.0}, {"y": 2023, "t": 79, "oc": 49.4, "ind": 36.7, "oci": 21.5}, {"y": 2024, "t": 48, "oc": 50.0, "ind": 39.6, "oci": 22.9}], "Costa Rica": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2014, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2020, "t": 1, "oc": 100.0, "ind": 100.0, "oci": 100.0}, {"y": 2021, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2022, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2023, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2024, "t": 0, "oc": 0, "ind": 0, "oci": 0}], "Dominican Republic": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 2, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2022, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2023, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2024, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}], "Ecuador": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2014, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 3, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2022, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2023, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2024, "t": 3, "oc": 0.0, "ind": 33.3, "oci": 0.0}], "Guatemala": [{"y": 2012, "t": 6, "oc": 0.0, "ind": 83.3, "oci": 0.0}, {"y": 2013, "t": 6, "oc": 16.7, "ind": 83.3, "oci": 16.7}, {"y": 2014, "t": 5, "oc": 0.0, "ind": 80.0, "oci": 0.0}, {"y": 2015, "t": 10, "oc": 0.0, "ind": 60.0, "oci": 0.0}, {"y": 2016, "t": 6, "oc": 0.0, "ind": 16.7, "oci": 0.0}, {"y": 2017, "t": 3, "oc": 0.0, "ind": 66.7, "oci": 0.0}, {"y": 2018, "t": 15, "oc": 0.0, "ind": 80.0, "oci": 0.0}, {"y": 2019, "t": 12, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2020, "t": 13, "oc": 0.0, "ind": 30.8, "oci": 0.0}, {"y": 2021, "t": 4, "oc": 0.0, "ind": 25.0, "oci": 0.0}, {"y": 2022, "t": 2, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2023, "t": 4, "oc": 0.0, "ind": 50.0, "oci": 0.0}, {"y": 2024, "t": 20, "oc": 30.0, "ind": 20.0, "oci": 0.0}], "Honduras": [{"y": 2012, "t": 25, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2013, "t": 10, "oc": 0.0, "ind": 40.0, "oci": 0.0}, {"y": 2014, "t": 12, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2015, "t": 8, "oc": 0.0, "ind": 75.0, "oci": 0.0}, {"y": 2016, "t": 14, "oc": 0.0, "ind": 35.7, "oci": 0.0}, {"y": 2017, "t": 5, "oc": 0.0, "ind": 20.0, "oci": 0.0}, {"y": 2018, "t": 4, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2019, "t": 14, "oc": 0.0, "ind": 42.9, "oci": 0.0}, {"y": 2020, "t": 17, "oc": 0.0, "ind": 17.6, "oci": 0.0}, {"y": 2021, "t": 8, "oc": 0.0, "ind": 25.0, "oci": 0.0}, {"y": 2022, "t": 14, "oc": 0.0, "ind": 35.7, "oci": 0.0}, {"y": 2023, "t": 18, "oc": 5.6, "ind": 22.2, "oci": 0.0}, {"y": 2024, "t": 6, "oc": 16.7, "ind": 0.0, "oci": 0.0}], "Mexico": [{"y": 2012, "t": 10, "oc": 20.0, "ind": 40.0, "oci": 0.0}, {"y": 2013, "t": 3, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2014, "t": 3, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2015, "t": 4, "oc": 0.0, "ind": 50.0, "oci": 0.0}, {"y": 2016, "t": 3, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2017, "t": 15, "oc": 6.7, "ind": 86.7, "oci": 6.7}, {"y": 2018, "t": 14, "oc": 14.3, "ind": 85.7, "oci": 7.1}, {"y": 2019, "t": 18, "oc": 11.1, "ind": 44.4, "oci": 11.1}, {"y": 2020, "t": 30, "oc": 3.3, "ind": 50.0, "oci": 0.0}, {"y": 2021, "t": 54, "oc": 16.7, "ind": 42.6, "oci": 1.9}, {"y": 2022, "t": 31, "oc": 0.0, "ind": 48.4, "oci": 0.0}, {"y": 2023, "t": 18, "oc": 22.2, "ind": 72.2, "oci": 22.2}, {"y": 2024, "t": 19, "oc": 52.6, "ind": 15.8, "oci": 10.5}], "Nicaragua": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 12, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2016, "t": 8, "oc": 0.0, "ind": 87.5, "oci": 0.0}, {"y": 2017, "t": 4, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 5, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2020, "t": 12, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2021, "t": 15, "oc": 86.7, "ind": 100.0, "oci": 86.7}, {"y": 2022, "t": 3, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2023, "t": 10, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2024, "t": 4, "oc": 0.0, "ind": 100.0, "oci": 0.0}], "Panama": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2022, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2023, "t": 4, "oc": 0.0, "ind": 25.0, "oci": 0.0}, {"y": 2024, "t": 0, "oc": 0, "ind": 0, "oci": 0}], "Paraguay": [{"y": 2012, "t": 10, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2013, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2014, "t": 3, "oc": 66.7, "ind": 0.0, "oci": 0.0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2022, "t": 3, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2023, "t": 2, "oc": 0.0, "ind": 50.0, "oci": 0.0}, {"y": 2024, "t": 0, "oc": 0, "ind": 0, "oci": 0}], "Peru": [{"y": 2012, "t": 9, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2013, "t": 3, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2014, "t": 9, "oc": 0.0, "ind": 77.8, "oci": 0.0}, {"y": 2015, "t": 12, "oc": 0.0, "ind": 33.3, "oci": 0.0}, {"y": 2016, "t": 2, "oc": 0.0, "ind": 50.0, "oci": 0.0}, {"y": 2017, "t": 2, "oc": 100.0, "ind": 0.0, "oci": 0.0}, {"y": 2018, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2019, "t": 1, "oc": 100.0, "ind": 100.0, "oci": 100.0}, {"y": 2020, "t": 6, "oc": 0.0, "ind": 66.7, "oci": 0.0}, {"y": 2021, "t": 7, "oc": 42.9, "ind": 100.0, "oci": 42.9}, {"y": 2022, "t": 3, "oc": 0.0, "ind": 66.7, "oci": 0.0}, {"y": 2023, "t": 4, "oc": 75.0, "ind": 75.0, "oci": 75.0}, {"y": 2024, "t": 4, "oc": 50.0, "ind": 100.0, "oci": 50.0}], "Venezuela": [{"y": 2012, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2013, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2014, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2015, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2016, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2017, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2018, "t": 3, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2019, "t": 8, "oc": 100.0, "ind": 100.0, "oci": 100.0}, {"y": 2020, "t": 0, "oc": 0, "ind": 0, "oci": 0}, {"y": 2021, "t": 4, "oc": 100.0, "ind": 75.0, "oci": 75.0}, {"y": 2022, "t": 4, "oc": 0.0, "ind": 100.0, "oci": 0.0}, {"y": 2023, "t": 1, "oc": 0.0, "ind": 0.0, "oci": 0.0}, {"y": 2024, "t": 1, "oc": 0.0, "ind": 100.0, "oci": 0.0}]};
+const WORLD_DATA    = [{"country": "Argentina", "total": 8, "lat": -26.521975, "lon": -62.577061, "attacks_2024": 1}, {"country": "Australia", "total": 1, "lat": -29.149892, "lon": 150.295948, "attacks_2024": 0}, {"country": "Bangladesh", "total": 7, "lat": 23.06885, "lon": 90.680529, "attacks_2024": 0}, {"country": "Bolivia", "total": 2, "lat": -16.070583, "lon": -61.016765, "attacks_2024": 0}, {"country": "Brazil", "total": 413, "lat": -5.629632, "lon": -49.273487, "attacks_2024": 12}, {"country": "Burkina Faso", "total": 2, "lat": 13.38006, "lon": 0.66799, "attacks_2024": 0}, {"country": "Cambodia", "total": 11, "lat": 13.077629, "lon": 104.23858, "attacks_2024": 1}, {"country": "Cameroon", "total": 2, "lat": 8.397517, "lon": 14.165625, "attacks_2024": 1}, {"country": "Canada", "total": 1, "lat": 43.653225, "lon": -79.383186, "attacks_2024": 0}, {"country": "Chad", "total": 5, "lat": 10.89211, "lon": 19.82177, "attacks_2024": 0}, {"country": "Chile", "total": 5, "lat": -39.709646, "lon": -72.747157, "attacks_2024": 1}, {"country": "Colombia", "total": 509, "lat": 2.623652, "lon": -76.569014, "attacks_2024": 48}, {"country": "Costa Rica", "total": 4, "lat": 9.068111, "lon": -83.287139, "attacks_2024": 0}, {"country": "Democratic Republic of the Congo", "total": 78, "lat": -9.151516, "lon": 25.8415, "attacks_2024": 4}, {"country": "Dominican Republic", "total": 4, "lat": 18.906758, "lon": -70.742187, "attacks_2024": 1}, {"country": "Ecuador", "total": 9, "lat": 0.806131, "lon": -78.9678, "attacks_2024": 3}, {"country": "France", "total": 1, "lat": 43.852799, "lon": 1.810783, "attacks_2024": 0}, {"country": "Gabon", "total": 1, "lat": 1.012406, "lon": 13.950491, "attacks_2024": 0}, {"country": "Gambia", "total": 2, "lat": 13.259011, "lon": -16.521581, "attacks_2024": 0}, {"country": "Ghana", "total": 2, "lat": 5.635041, "lon": 0.016924, "attacks_2024": 0}, {"country": "Guatemala", "total": 106, "lat": 14.13673, "lon": -90.009866, "attacks_2024": 20}, {"country": "Honduras", "total": 155, "lat": 15.919147, "lon": -85.956541, "attacks_2024": 6}, {"country": "India", "total": 87, "lat": 17.421574, "lon": 78.449013, "attacks_2024": 1}, {"country": "Indonesia", "total": 25, "lat": 3.559076, "lon": 98.738304, "attacks_2024": 5}, {"country": "Iran", "total": 9, "lat": 35.689198, "lon": 51.388973, "attacks_2024": 0}, {"country": "Iraq", "total": 1, "lat": 30.51923, "lon": 47.760948, "attacks_2024": 0}, {"country": "Ireland", "total": 1, "lat": 52.27019, "lon": -8.5977, "attacks_2024": 0}, {"country": "Kazakhstan", "total": 3, "lat": 51.860401, "lon": 69.807037, "attacks_2024": 0}, {"country": "Kenya", "total": 6, "lat": -1.23026, "lon": 36.84144, "attacks_2024": 0}, {"country": "Kiribati", "total": 1, "lat": -3.370417, "lon": -168.734039, "attacks_2024": 0}, {"country": "Laos", "total": 1, "lat": 17.897033, "lon": 102.639675, "attacks_2024": 0}, {"country": "Liberia", "total": 6, "lat": 7.012047, "lon": -11.117818, "attacks_2024": 3}, {"country": "Madagascar", "total": 3, "lat": -19.193765, "lon": 48.007645, "attacks_2024": 1}, {"country": "Malawi", "total": 1, "lat": -15.936139, "lon": 34.641381, "attacks_2024": 0}, {"country": "Malaysia", "total": 1, "lat": 1.553278, "lon": 110.359213, "attacks_2024": 0}, {"country": "Mexico", "total": 222, "lat": 20.616628, "lon": -103.327808, "attacks_2024": 19}, {"country": "Mozambique", "total": 1, "lat": -16.117058, "lon": 33.723831, "attacks_2024": 0}, {"country": "Myanmar", "total": 8, "lat": 22.331323, "lon": 96.80027, "attacks_2024": 0}, {"country": "Nepal", "total": 1, "lat": 26.833168, "lon": 86.054651, "attacks_2024": 0}, {"country": "Nicaragua", "total": 74, "lat": 13.54327, "lon": -85.538604, "attacks_2024": 4}, {"country": "Pakistan", "total": 5, "lat": 33.684422, "lon": 73.047882, "attacks_2024": 0}, {"country": "Panama", "total": 5, "lat": 8.591924, "lon": -79.853346, "attacks_2024": 0}, {"country": "Papua New Guinea", "total": 4, "lat": -5.463423, "lon": 143.145372, "attacks_2024": 0}, {"country": "Paraguay", "total": 18, "lat": -22.651697, "lon": -56.025103, "attacks_2024": 0}, {"country": "Peru", "total": 62, "lat": -12.38655, "lon": -71.074051, "attacks_2024": 4}, {"country": "Philippines", "total": 306, "lat": 9.260908, "lon": 125.968701, "attacks_2024": 8}, {"country": "Romania", "total": 2, "lat": 47.45086, "lon": 23.86807, "attacks_2024": 0}, {"country": "Russia", "total": 5, "lat": 55.114497, "lon": 61.527456, "attacks_2024": 1}, {"country": "Rwanda", "total": 1, "lat": -1.955216, "lon": 30.082573, "attacks_2024": 0}, {"country": "Saudi Arabia", "total": 1, "lat": 24.77408, "lon": 46.81529, "attacks_2024": 0}, {"country": "Senegal", "total": 1, "lat": 12.771943, "lon": -15.668087, "attacks_2024": 0}, {"country": "South Africa", "total": 6, "lat": -24.407327, "lon": 31.31376, "attacks_2024": 0}, {"country": "Spain", "total": 2, "lat": 41.494152, "lon": 0.674318, "attacks_2024": 0}, {"country": "Sri Lanka", "total": 1, "lat": 7.22855, "lon": 81.471764, "attacks_2024": 0}, {"country": "Tanzania", "total": 2, "lat": -6.747371, "lon": 39.281697, "attacks_2024": 0}, {"country": "Thailand", "total": 13, "lat": 18.02427, "lon": 102.37252, "attacks_2024": 0}, {"country": "Türkiye", "total": 3, "lat": 41.392384, "lon": 41.538316, "attacks_2024": 1}, {"country": "Uganda", "total": 5, "lat": 0.61147, "lon": 30.64366, "attacks_2024": 0}, {"country": "Ukraine", "total": 4, "lat": 46.650452, "lon": 32.608181, "attacks_2024": 0}, {"country": "United States of America", "total": 2, "lat": 33.758695, "lon": -84.388903, "attacks_2024": 0}, {"country": "Venezuela", "total": 23, "lat": 4.622204, "lon": -65.224741, "attacks_2024": 1}, {"country": "Vietnam", "total": 1, "lat": 11.706528, "lon": 109.116657, "attacks_2024": 0}, {"country": "Zambia", "total": 1, "lat": -14.241257, "lon": 31.319849, "attacks_2024": 0}, {"country": "Zimbabwe", "total": 1, "lat": -21.805162, "lon": 31.719546, "attacks_2024": 0}];
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- i18n                                        -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+const I18N = {
+  en: {
+    kicker:"Investigative Report · Environmental Justice",
+    title:"How Organized Crime <em>Threatens</em> Environmental Defenders in Latin America",
+    subtitle:"From the Amazon to Central American forests, criminal networks are increasingly targeting the people who stand between nature and destruction — with lethal consequences.",
+    bylineLabel:"Story by",
+    placeholder1:"[ Placeholder — Opening paragraph: Set the scene with a specific case. ~150–200 words. ]",
+    placeholder2:"[ Placeholder — Scale of the problem across Latin America. ~150 words. ]",
+    placeholder3:"[ Placeholder — Link between organised crime and environmental defenders. ~150 words. ]",
+    placeholder4:"[ Placeholder — Disproportionate impact on Indigenous Peoples. ~150 words. ]",
+    placeholder5:"[ Placeholder — Country deep-dive (Colombia or Mexico). ~200 words. ]",
+    placeholder6:"[ Placeholder — Regional patterns. ~150 words. ]",
+    placeholder7:"[ Placeholder — Global context from the world map. ~150 words. ]",
+    placeholder8:"[ Placeholder — Structural factors: impunity, weak rule of law. ~150 words. ]",
+    placeholder9:"[ Placeholder — Policy responses. ~150 words. ]",
+    placeholder10:"[ Placeholder — Closing paragraph. ~150 words. ]",
+    viz1label:"Visualisation 1 of 3", viz1title:"Country snapshot: attacks, perpetrators and criminality",
+    viz1sub:"Select a Latin American country to explore the full profile of attacks against environmental defenders. Data: Front Line Defenders / Global Witness, OCI 2023.",
+    viz2label:"Visualisation 2 of 3", viz2title:"A global crisis, concentrated in Latin America",
+    viz2sub:"Total recorded attacks against environmental defenders by country, 2012–2024. Hover over a country for details.",
+    viz3label:"Visualisation 3 of 3", viz3title:"Rising violence: attacks over time by country",
+    viz3sub:"Annual attacks against environmental defenders, 2012–2024. Switch between metrics using the buttons below.",
+    selectLabel:"Select country —",
+    cardTotal:"Total attacks recorded", card2012:"Since 2012",
+    cardOC:"Organised crime share", cardPct:"% of all attacks",
+    cardIndigenous:"Indigenous Peoples share", cardOCInd:"OC targeting Indigenous",
+    card2024:"Attacks in 2024", cardLatest:"Latest full year",
+    cardActType:"Attack type breakdown", cardOCI:"Organized Crime Index 2023",
+    btnWorld:"World view", btnLatam:"Focus: Latin America",
+    legendAttacks:"Attacks →",
+    metricTotal:"Total attacks", metricOC:"Organised crime %",
+    metricInd:"Indigenous victims %", metricOCI:"OC targeting Indigenous %",
+    methodBtn:"Methodology & Data Sources",
+    methodText1:"[ Placeholder — Data sources. ~120 words. ]",
+    methodText2:"[ Placeholder — Methodology and limitations. ~120 words. ]",
+    footerText:"Data: Front Line Defenders / Global Witness · Organized Crime Index 2023 (GI-TOC) · Caroline Chaffiotte, Fernanda Gandara Marchant & Annika Mösl",
+    ttTotal:"Total attacks", ttYear:"In 2024",
+    murder:"Murder", disappearance:"Disappearance",
+    criminality:"Criminality", resilience:"Resilience"
+  },
+  es: {
+    kicker:"Reportaje de Investigación · Justicia Ambiental",
+    title:"Cómo el Crimen Organizado <em>Amenaza</em> a los Defensores Ambientales en América Latina",
+    subtitle:"Desde la Amazonía hasta los bosques centroamericanos, las redes criminales atacan cada vez más a quienes se interponen entre la naturaleza y su destrucción — con consecuencias letales.",
+    bylineLabel:"Reportaje de",
+    placeholder1:"[ Marcador — Párrafo inicial: contexto con un caso concreto. ~150–200 palabras. ]",
+    placeholder2:"[ Marcador — Dimensionar el problema en América Latina. ~150 palabras. ]",
+    placeholder3:"[ Marcador — Vínculo entre crimen organizado y defensores. ~150 palabras. ]",
+    placeholder4:"[ Marcador — Impacto sobre Pueblos Indígenas. ~150 palabras. ]",
+    placeholder5:"[ Marcador — Perfil de Colombia o México. ~200 palabras. ]",
+    placeholder6:"[ Marcador — Patrones regionales. ~150 palabras. ]",
+    placeholder7:"[ Marcador — Contexto global. ~150 palabras. ]",
+    placeholder8:"[ Marcador — Factores estructurales. ~150 palabras. ]",
+    placeholder9:"[ Marcador — Respuestas de política pública. ~150 palabras. ]",
+    placeholder10:"[ Marcador — Párrafo final. ~150 palabras. ]",
+    viz1label:"Visualización 1 de 3", viz1title:"Perfil por país: ataques, perpetradores y criminalidad",
+    viz1sub:"Selecciona un país para explorar el perfil completo de ataques contra defensores ambientales. Datos: Front Line Defenders / Global Witness, ÍCO 2023.",
+    viz2label:"Visualización 2 de 3", viz2title:"Una crisis global, concentrada en América Latina",
+    viz2sub:"Total de ataques registrados contra defensores ambientales por país, 2012–2024.",
+    viz3label:"Visualización 3 de 3", viz3title:"Violencia en aumento: ataques a lo largo del tiempo",
+    viz3sub:"Ataques anuales contra defensores ambientales, 2012–2024.",
+    selectLabel:"Seleccionar país —",
+    cardTotal:"Ataques totales registrados", card2012:"Desde 2012",
+    cardOC:"Participación del crimen organizado", cardPct:"% del total de ataques",
+    cardIndigenous:"Proporción de Pueblos Indígenas", cardOCInd:"CO atacando indígenas",
+    card2024:"Ataques en 2024", cardLatest:"Último año completo",
+    cardActType:"Tipo de ataque", cardOCI:"Índice de Crimen Organizado 2023",
+    btnWorld:"Vista global", btnLatam:"Foco: América Latina",
+    legendAttacks:"Ataques →",
+    metricTotal:"Ataques totales", metricOC:"% crimen organizado",
+    metricInd:"% víctimas indígenas", metricOCI:"% CO sobre indígenas",
+    methodBtn:"Metodología y Fuentes de Datos",
+    methodText1:"[ Marcador — Fuentes de datos. ~120 palabras. ]",
+    methodText2:"[ Marcador — Metodología y limitaciones. ~120 palabras. ]",
+    footerText:"Datos: Front Line Defenders / Global Witness · ÍCO 2023 (GI-TOC) · Caroline Chaffiotte, Fernanda Gandara Marchant y Annika Mösl",
+    ttTotal:"Ataques totales", ttYear:"En 2024",
+    murder:"Asesinato", disappearance:"Desaparición",
+    criminality:"Criminalidad", resilience:"Resiliencia"
+  }
+};
+
+let currentLang = 'en';
+function t(k){ return I18N[currentLang][k] || k; }
+
+function setLang(lang){
+  currentLang = lang;
+  document.querySelectorAll('#lang-switch button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#lang-switch button[onclick="setLang('${lang}')"]`).classList.add('active');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if(k === 'title'){ el.innerHTML = t(k); return; }
+    el.textContent = t(k);
+  });
+  updateDashboard(document.getElementById('dashboard-country').value);
+  updateChart(currentChartCountry);
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Dashboard                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+function updateDashboard(country){
+  const s = COUNTRY_STATS[country];
+  if(!s) return;
+  document.getElementById('d-total').textContent     = s.total.toLocaleString();
+  document.getElementById('d-oc').textContent        = s.oc_share + '%';
+  document.getElementById('d-indigenous').textContent = s.indigenous_share + '%';
+  document.getElementById('d-oc-ind').textContent    = s.oc_indigenous_share + '%';
+  document.getElementById('d-2024').textContent      = s.attacks_2024;
+
+  // Donuts
+  const dc = document.getElementById('donut-container');
+  const total = s.murders + s.disappearances;
+  dc.innerHTML = '';
+  [{label:t('murder'),value:s.murders,color:'#c0392b'},
+   {label:t('disappearance'),value:s.disappearances,color:'#e67e22'}
+  ].forEach(item => {
+    const pct  = total > 0 ? Math.round(item.value/total*100) : 0;
+    const r=28, cx=36, cy=36, circ=2*Math.PI*r;
+    const dash = (pct/100)*circ;
+    dc.innerHTML += `<div class="donut-item">
+      <svg width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#222" stroke-width="8"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${item.color}" stroke-width="8"
+          stroke-dasharray="${dash} ${circ}" transform="rotate(-90 ${cx} ${cy})"/>
+        <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central"
+          fill="#fff" font-size="13" font-family="'Playfair Display',serif" font-weight="700">${pct}%</text>
+      </svg>
+      <div class="donut-label">${item.label}<br><span style="color:var(--text2)">${item.value}</span></div>
+    </div>`;
+  });
+
+  // Score bars
+  const cScore = s.criminality || 0, rScore = s.resilience || 0;
+  document.getElementById('score-bars').innerHTML = `
+    <div><div class="score-bar-label">${t('criminality')} <span>${cScore.toFixed(2)}/10</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill criminality" style="width:${cScore*10}%"></div></div></div>
+    <div><div class="score-bar-label">${t('resilience')} <span>${rScore.toFixed(2)}/10</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill resilience" style="width:${rScore*10}%"></div></div></div>`;
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- World Map                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+const worldDataMap = {};
+WORLD_DATA.forEach(d => { worldDataMap[d.country] = d; });
+
+const NAME_ALIASES = {
+  'United States of America':['United States','USA'],
+  'Democratic Republic of the Congo':['Dem. Rep. Congo','Congo, Dem. Rep.'],
+  'Türkiye':['Turkey']
+};
+function matchName(n){
+  for(const [k,v] of Object.entries(NAME_ALIASES)){
+    if(v.includes(n) || n === k) return k;
+  }
+  return n;
+}
+function attackColor(d){
+  if(!d||d.total===0) return '#1a1a1a';
+  if(d.total<=10)  return '#4a1a1a';
+  if(d.total<=30)  return '#7a2020';
+  if(d.total<=80)  return '#a83020';
+  if(d.total<=200) return '#c0392b';
+  return '#e74c3c';
+}
+
+let mapSvg, mapZoom;
+
+async function initMap(){
+  const container = document.getElementById('map-container');
+  const W = container.offsetWidth, H = Math.round(W*0.52);
+  mapSvg = d3.select('#world-map').attr('viewBox',`0 0 ${W} ${H}`).attr('width',W).attr('height',H);
+  const proj = d3.geoNaturalEarth1().scale(W/6.3).translate([W/2,H/2]);
+  const path = d3.geoPath().projection(proj);
+  mapZoom = d3.zoom().scaleExtent([0.5,10]).on('zoom', e => g.attr('transform',e.transform));
+  mapSvg.call(mapZoom);
+  const g = mapSvg.append('g');
+  try{
+    const world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    const feats = topojson.feature(world, world.objects.countries).features;
+    g.selectAll('.country-path').data(feats).enter().append('path')
+      .attr('class','country-path').attr('d',path)
+      .attr('fill', d => {
+        const nm = (d.properties&&d.properties.name)||'';
+        return attackColor(worldDataMap[matchName(nm)]);
+      })
+      .on('mouseover', function(ev,d){
+        const nm = (d.properties&&d.properties.name)||'Unknown';
+        const data = worldDataMap[matchName(nm)];
+        const tt = document.getElementById('map-tooltip');
+        tt.style.display='block';
+        tt.innerHTML=`<strong>${nm}</strong>
+          <div class="tt-row"><span>${t('ttTotal')}:</span><span class="tt-val">${data?data.total:0}</span></div>
+          <div class="tt-row"><span>${t('ttYear')}:</span><span class="tt-val">${data?data.attacks_2024:0}</span></div>`;
+        posTooltip(ev,tt);
+      })
+      .on('mousemove',ev=>posTooltip(ev,document.getElementById('map-tooltip')))
+      .on('mouseout',()=>{ document.getElementById('map-tooltip').style.display='none'; });
+  }catch(e){
+    // Fallback: bubble map
+    g.append('rect').attr('width',W).attr('height',H).attr('fill','#151515').attr('rx',4);
+    const sz = d3.scaleSqrt().domain([0,509]).range([3,30]);
+    g.selectAll('circle').data(WORLD_DATA).enter().append('circle')
+      .attr('cx',d=>proj([d.lon,d.lat])[0]).attr('cy',d=>proj([d.lon,d.lat])[1])
+      .attr('r',d=>sz(d.total)).attr('fill',d=>attackColor(d)).attr('fill-opacity',.8)
+      .attr('stroke','rgba(255,255,255,.2)').attr('stroke-width',.5)
+      .on('mouseover',function(ev,d){
+        const tt=document.getElementById('map-tooltip');
+        tt.style.display='block';
+        tt.innerHTML=`<strong>${d.country}</strong>
+          <div class="tt-row"><span>${t('ttTotal')}:</span><span class="tt-val">${d.total}</span></div>
+          <div class="tt-row"><span>${t('ttYear')}:</span><span class="tt-val">${d.attacks_2024}</span></div>`;
+        posTooltip(ev,tt);
+      })
+      .on('mousemove',ev=>posTooltip(ev,document.getElementById('map-tooltip')))
+      .on('mouseout',()=>{ document.getElementById('map-tooltip').style.display='none'; });
+  }
+}
+
+function posTooltip(ev,tt){
+  const r=document.getElementById('map-container').getBoundingClientRect();
+  let x=ev.clientX-r.left+12, y=ev.clientY-r.top-12;
+  if(x+210>r.width) x-=222;
+  if(y<0) y=0;
+  tt.style.left=x+'px'; tt.style.top=y+'px';
+}
+
+function zoomMap(view){
+  const container=document.getElementById('map-container');
+  const W=container.offsetWidth, H=Math.round(W*0.52);
+  document.getElementById('btn-world').classList.toggle('active',view==='world');
+  document.getElementById('btn-latam').classList.toggle('active',view==='latam');
+  if(!mapSvg) return;
+  if(view==='latam'){
+    mapSvg.transition().duration(750).call(mapZoom.transform,
+      d3.zoomIdentity.translate(W*0.62,H*0.62).scale((W/3.2)/(W/6.3)));
+  } else {
+    mapSvg.transition().duration(750).call(mapZoom.transform, d3.zoomIdentity);
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Bar Chart                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+let currentMetric = 'total';
+let currentChartCountry = 'Colombia';
+
+function setMetric(m){
+  currentMetric = m;
+  ['total','oc','ind','oci'].forEach(x =>
+    document.getElementById('metric-'+x).classList.toggle('active', x===m));
+  updateChart(currentChartCountry);
+}
+
+function updateChart(country){
+  currentChartCountry = country;
+  document.getElementById('chart-country').value = country;
+  const data = TIMELINE[country]; if(!data) return;
+  const svg = d3.select('#bar-chart');
+  svg.selectAll('*').remove();
+  const W = svg.node().parentElement.offsetWidth || 700;
+  const H = 340, m = {top:20,right:20,bottom:40,left:48};
+  const w = W-m.left-m.right, h = H-m.top-m.bottom;
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${m.left},${m.top})`);
+  const key = {total:'t',oc:'oc',ind:'ind',oci:'oci'}[currentMetric];
+  const isPct = currentMetric !== 'total';
+  const col = {total:'#c0392b',oc:'#e67e22',ind:'#1abc9c',oci:'#e74c3c'}[currentMetric];
+  const xSc = d3.scaleBand().domain(data.map(d=>d.y)).range([0,w]).padding(.25);
+  const maxV = isPct ? 100 : Math.max(...data.map(d=>d[key]),5);
+  const ySc = d3.scaleLinear().domain([0,maxV]).range([h,0]).nice();
+  g.selectAll('.gl').data(ySc.ticks(5)).enter().append('line')
+    .attr('x1',0).attr('x2',w).attr('y1',d=>ySc(d)).attr('y2',d=>ySc(d))
+    .attr('stroke','rgba(255,255,255,.05)');
+  g.append('g').attr('transform',`translate(0,${h})`).call(d3.axisBottom(xSc))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();
+      ax.selectAll('text').attr('fill','#6a6050').attr('font-size','10px')
+        .attr('font-family','IBM Plex Mono,monospace').attr('dy','1.2em')});
+  g.append('g').call(d3.axisLeft(ySc).ticks(5).tickFormat(d=>isPct?d+'%':d))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();
+      ax.selectAll('text').attr('fill','#6a6050').attr('font-size','10px')
+        .attr('font-family','IBM Plex Mono,monospace')});
+  const tip = document.createElement('div');
+  tip.style.cssText='position:fixed;background:rgba(13,13,13,.96);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:10px 14px;font-size:.8rem;pointer-events:none;display:none;z-index:999;color:#a09880';
+  document.body.appendChild(tip);
+  g.selectAll('.bar').data(data).enter().append('rect').attr('class','bar')
+    .attr('x',d=>xSc(d.y)).attr('width',xSc.bandwidth())
+    .attr('y',h).attr('height',0).attr('rx',2)
+    .attr('fill',d=>d[key]===0?'#2a2a2a':col)
+    .on('mouseover',function(ev,d){
+      d3.select(this).attr('opacity',.7);
+      tip.style.display='block';
+      tip.innerHTML=`<strong style="color:#fff;font-family:'Playfair Display',serif">${d.y}</strong><br>${country}: <span style="color:#e74c3c">${isPct?d[key]+'%':d[key]}</span>`;
+    })
+    .on('mousemove',ev=>{ tip.style.left=(ev.clientX+12)+'px'; tip.style.top=(ev.clientY-32)+'px'; })
+    .on('mouseout',function(ev,d){
+      d3.select(this).attr('opacity',1); tip.style.display='none'; })
+    .transition().duration(400).delay((_,i)=>i*25)
+    .attr('y',d=>ySc(d[key])).attr('height',d=>h-ySc(d[key]));
+  const mp = data.reduce((a,b)=>b[key]>a[key]?b:a, data[0]);
+  if(mp[key]>0)
+    g.append('text').attr('x',xSc(mp.y)+xSc.bandwidth()/2).attr('y',ySc(mp[key])-6)
+      .attr('text-anchor','middle').attr('fill','#a09880').attr('font-size','10px')
+      .attr('font-family','IBM Plex Mono,monospace')
+      .text(isPct?mp[key]+'%':mp[key]);
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Methodology + Init                          -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+function toggleMethodology(){
+  document.getElementById('method-btn').classList.toggle('open');
+  document.getElementById('method-body').classList.toggle('open');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateDashboard('Colombia');
+  initMap();
+  updateChart('Colombia');
+  window.addEventListener('resize', () => updateChart(currentChartCountry));
+});
+</script>
+
+</body>
+</html>
